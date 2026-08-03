@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: digesto-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: digesto
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - digesto_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  digesto_postgres_data:
