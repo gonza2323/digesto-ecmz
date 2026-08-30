@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 public class UsuarioDetailDto {
     private Long id;
     private String email;
-    private UserRole rol;
+    private UserRole role;
 }
