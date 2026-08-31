@@ -19,11 +19,16 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private final Collection<UserRole> roles;
 
-    public CustomUserDetails(UUID id, String email, String password, Collection<UserRole> roles) {
+    @Getter
+    private final boolean mustChangePassword;
+
+    public CustomUserDetails(UUID id, String email, String password, Collection<UserRole> roles,
+                             boolean mustChangePassword) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.roles = roles;
+        this.mustChangePassword = mustChangePassword;
     }
 
     // Métodos de UserDetails

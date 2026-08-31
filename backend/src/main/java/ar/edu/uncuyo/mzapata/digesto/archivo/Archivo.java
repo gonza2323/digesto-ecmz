@@ -1,10 +1,8 @@
-package ar.edu.uncuyo.mzapata.digesto.user;
+package ar.edu.uncuyo.mzapata.digesto.archivo;
 
 import ar.edu.uncuyo.mzapata.digesto.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,23 +15,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario extends BaseEntity {
+public class Archivo extends BaseEntity {
+
+    /** Nombre del archivo dentro de la carpeta de almacenamiento. */
+    @Column(nullable = false)
+    private String path;
+
+    /** Nombre original con el que se subió. */
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false)
-    private String firstname;
+    private long size;
 
     @Column(nullable = false)
-    private String lastname;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String passwordHash;
-
-    private boolean mustChangePassword;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private String mime;
 }

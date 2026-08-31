@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +20,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmailAndDeletedFalse(username);
+        Usuario usuario = usuarioRepository.findByEmailAndDeletedFalse(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        if (usuarioOpt.isEmpty())
-            throw new UsernameNotFoundException("Usuario no encontrado");
-
-        Usuario usuario = usuarioOpt.get();
-        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPasswordHash(), List.of(usuario.getRole()));
+        return new CustomUserDetails(
+                usuario.getId(),
+                usuario.getEmail(),
+                usuario.getPasswordHash(),
+                List.of(usuario.getRole()),
+                usuario.isMustChangePassword());
     }
 }
