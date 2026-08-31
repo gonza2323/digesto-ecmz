@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 
 
 @Service
@@ -33,6 +34,13 @@ public class UsuarioService {
         return usuario;
     }
 
+    @Transactional
+    public void deleteUsuario(UsuarioSummaryDto dto){
+        Usuario usuarioActual = repository.findByEmailAndDeletedFalse(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("No se pudo encontrar al usuario"));
+
+        usuarioActual.setDeleted(true);
+    }
 
     //Valido Campos
     //TODO: Mejorar la validacion del email y revisar
