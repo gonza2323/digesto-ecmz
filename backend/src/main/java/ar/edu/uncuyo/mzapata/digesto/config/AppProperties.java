@@ -6,29 +6,33 @@ import java.util.List;
 
 @ConfigurationProperties(prefix = "app")
 public record AppProperties(
-    Auth auth,
-    String apiUrl,
-    String frontendUrl,
-    List<String> corsOrigins,
-    Storage storage,
-    Mail mail,
-    Backup backup
+        Auth auth,
+        String apiUrl,
+        String frontendUrl,
+        List<String> corsOrigins,
+        Storage storage,
+        Mail mail,
+        Backup backup
 ) {
-    public record Auth(AccessToken accessToken, PasswordReset passwordReset) {
-        public record AccessToken(
-            String secret,
-            long durationMinutes
-        ) {}
-
+    public record Auth(PasswordReset passwordReset) {
         public record PasswordReset(long durationMinutes) {}
     }
 
-    /** Carpeta del disco donde se guardan los PDF de las normativas. */
-    public record Storage(String dir) {}
+    /**
+     * Carpeta del disco donde se guardan los PDF de las normativas.
+     */
+    public record Storage(String dir) {
+    }
 
-    /** Remitente de los correos salientes. */
-    public record Mail(String from) {}
+    /**
+     * Remitente de los correos salientes.
+     */
+    public record Mail(String from) {
+    }
 
-    /** Binarios de PostgreSQL usados para el dump/restauración y umbral de la alerta. */
-    public record Backup(String pgDump, String psql, int alertMonths) {}
+    /**
+     * Binarios de PostgreSQL usados para el dump/restauración y umbral de la alerta.
+     */
+    public record Backup(String pgDump, String psql, int alertMonths) {
+    }
 }

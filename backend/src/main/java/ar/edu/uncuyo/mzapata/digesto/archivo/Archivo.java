@@ -17,11 +17,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Archivo extends BaseEntity {
 
-    /** Nombre del archivo dentro de la carpeta de almacenamiento. */
+    /**
+     * Nombre del archivo dentro de la carpeta de almacenamiento.
+     */
     @Column(nullable = false)
     private String path;
 
-    /** Nombre original con el que se subió. */
+    /**
+     * Nombre original con el que se subió.
+     */
     @Column(nullable = false)
     private String name;
 

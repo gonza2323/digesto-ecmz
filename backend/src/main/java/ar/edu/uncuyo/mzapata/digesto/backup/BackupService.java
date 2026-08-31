@@ -19,7 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -63,6 +65,17 @@ public class BackupService {
 
     // ---------- Estado ----------
 
+    private static void deleteQuietly(Path path) {
+        if (path == null) return;
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            log.warn("No se pudo borrar {}: {}", path, e.getMessage());
+        }
+    }
+
+    // ---------- Generación ----------
+
     @Transactional(readOnly = true)
     public BackupStatusDto status() {
         String stored = appSettingService.get(AppSettingService.LAST_BACKUP, null);
@@ -76,9 +89,11 @@ public class BackupService {
         return new BackupStatusDto(ultimo, alerta, meses);
     }
 
-    // ---------- Generación ----------
+    // ---------- Restauración ----------
 
-    /** Arma el ZIP en un archivo temporal y registra la fecha del backup. */
+    /**
+     * Arma el ZIP en un archivo temporal y registra la fecha del backup.
+     */
     @Transactional
     public Path createBackup() {
         try {
@@ -120,8 +135,6 @@ public class BackupService {
             throw new BusinessException("No se pudo generar el backup: " + e.getMessage());
         }
     }
-
-    // ---------- Restauración ----------
 
     /**
      * Valida el ZIP, confirma la contraseña del superadmin y reemplaza base de datos y archivos.
@@ -181,7 +194,9 @@ public class BackupService {
         return dump;
     }
 
-    /** Todo archivo listado en el manifiesto debe venir dentro del ZIP. */
+    /**
+     * Todo archivo listado en el manifiesto debe venir dentro del ZIP.
+     */
     private void validarArchivosReferenciados(ZipFile zip) throws IOException {
         ZipEntry entry = zip.getEntry(MANIFEST_ENTRY);
         if (entry == null)
@@ -202,6 +217,8 @@ public class BackupService {
             throw new BusinessException("Faltan en el ZIP " + faltantes.size()
                     + " archivo(s) referenciados por la base de datos: " + String.join(", ", faltantes));
     }
+
+    // ---------- Ejecución de pg_dump / psql ----------
 
     private void reemplazarArchivos(ZipFile zip) throws IOException {
         Path dir = archivoService.storageDir();
@@ -228,8 +245,6 @@ public class BackupService {
             }
         }
     }
-
-    // ---------- Ejecución de pg_dump / psql ----------
 
     private void runPgDump(Path salida) {
         Matcher conexion = conexion();
@@ -294,15 +309,6 @@ public class BackupService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new BusinessException("La operación fue interrumpida");
-        }
-    }
-
-    private static void deleteQuietly(Path path) {
-        if (path == null) return;
-        try {
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            log.warn("No se pudo borrar {}: {}", path, e.getMessage());
         }
     }
 }

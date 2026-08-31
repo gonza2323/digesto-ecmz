@@ -13,7 +13,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
-/** Enlace temporal para recuperar la contraseña. */
+/**
+ * Enlace temporal para recuperar la contraseña.
+ */
 @Entity
 @Getter
 @Setter

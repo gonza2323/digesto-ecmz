@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/** Valores previos de una normativa publicada, guardados antes de modificarla. */
+/**
+ * Valores previos de una normativa publicada, guardados antes de modificarla.
+ */
 public record NormativaSnapshot(
         Integer number,
         String title,

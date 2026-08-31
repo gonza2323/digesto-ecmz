@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/** Carga inicial: tipos de normativa, autoridades y las dos cuentas administrativas. */
+/**
+ * Carga inicial: tipos de normativa, autoridades y las dos cuentas administrativas.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

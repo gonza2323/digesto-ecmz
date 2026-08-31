@@ -5,4 +5,5 @@ import ar.edu.uncuyo.mzapata.digesto.user.UserRole;
 import java.util.Collection;
 import java.util.UUID;
 
-public record AuthUserDto(UUID userId, Collection<UserRole> roles, boolean mustChangePassword) {}
+public record AuthUserDto(UUID userId, Collection<UserRole> roles, boolean mustChangePassword) {
+}

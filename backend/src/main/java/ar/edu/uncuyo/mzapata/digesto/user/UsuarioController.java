@@ -1,6 +1,6 @@
 package ar.edu.uncuyo.mzapata.digesto.user;
 
-import ar.edu.uncuyo.mzapata.digesto.auth.CurrentUser;
+import ar.edu.uncuyo.mzapata.digesto.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/** Gestión de cuentas administrativas: sólo superadmin. */
+/**
+ * Gestión de cuentas administrativas: sólo superadmin.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/usuarios")
@@ -35,7 +37,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id, @AuthenticationPrincipal CurrentUser current) {
+    public void delete(@PathVariable UUID id, @AuthenticationPrincipal CustomUserDetails current) {
         usuarioService.delete(id, current.getId());
     }
 }

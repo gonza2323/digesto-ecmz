@@ -22,12 +22,16 @@ public record NormativaDetailDto(
         String estado,
         List<String> notificaciones
 ) {
-    /** Vista pública: sin la lista de correos notificados. */
+    /**
+     * Vista pública: sin la lista de correos notificados.
+     */
     public static NormativaDetailDto of(Normativa n) {
         return build(n, null);
     }
 
-    /** Vista de administración: incluye los correos a notificar. */
+    /**
+     * Vista de administración: incluye los correos a notificar.
+     */
     public static NormativaDetailDto ofAdmin(Normativa n) {
         return build(n, n.getNotificaciones().stream().map(Notificacion::getEmail).toList());
     }

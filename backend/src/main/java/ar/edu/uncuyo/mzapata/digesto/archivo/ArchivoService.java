@@ -22,7 +22,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-/** Guarda los PDF en disco y extrae su texto para la búsqueda. */
+/**
+ * Guarda los PDF en disco y extrae su texto para la búsqueda.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -38,7 +40,9 @@ public class ArchivoService {
         return storageDir().resolve(archivo.getPath());
     }
 
-    /** Copia el PDF subido a la carpeta de almacenamiento con un nombre único. */
+    /**
+     * Copia el PDF subido a la carpeta de almacenamiento con un nombre único.
+     */
     public Archivo store(MultipartFile file) {
         if (file == null || file.isEmpty())
             throw new BusinessException("Adjunte el archivo PDF de la normativa");
@@ -67,7 +71,9 @@ public class ArchivoService {
                 .build();
     }
 
-    /** Respuesta HTTP con el PDF: adjunto si se pide descargar, en línea si se abre en otra pestaña. */
+    /**
+     * Respuesta HTTP con el PDF: adjunto si se pide descargar, en línea si se abre en otra pestaña.
+     */
     public ResponseEntity<Resource> toResponse(Archivo archivo, boolean download) {
         Resource resource = new FileSystemResource(resolve(archivo));
         if (!resource.exists())

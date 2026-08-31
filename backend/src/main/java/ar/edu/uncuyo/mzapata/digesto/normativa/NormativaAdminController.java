@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 import java.util.UUID;
 
-/** Panel de administración: incluye borradores y pendientes de aprobación. */
+/**
+ * Panel de administración: incluye borradores y pendientes de aprobación.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/normativas")

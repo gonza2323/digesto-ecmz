@@ -20,15 +20,17 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
 
-    public CustomUserDetails loginWithEmailPassword(LoginRequestDto loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
+    /**
+     * Valida las credenciales y devuelve la Authentication resultante, para que el
+     * controller la guarde en la sesión HTTP.
+     */
+    public Authentication loginWithEmailPassword(LoginRequestDto loginRequest) {
+        return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
-
-        return (CustomUserDetails) authentication.getPrincipal();
     }
 
     @Transactional(readOnly = true)

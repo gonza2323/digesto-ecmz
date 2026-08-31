@@ -1,0 +1,358 @@
+Necesitamos elaborar una página web para un sistema de publicación de documentos de una institución anexa de nuestra universidad. Te dejaré todos los detalles que tenga a mano para que me guíes en su elaboración.
+
+La página web actual (la que queremos rehacer) es la siguiente: https://digesto.ingenieria.uncuyo.edu.ar/
+La página modelo que aspiramos tener es la siguiente: https://digesto.uncuyo.edu.ar/v3/
+
+El sistema funciona de la siguiente manera, lo que se publica en la página web son las Normativas, que tienen un número (no me refiero al id, sino al número propio) que no puede repetirse por año y tipo de Normativa.
+
+Todas las clases es probable que tengan los siguiente métodos, los escribo de forma genérica:
+createClassName(ClassNameDTO): ClassName
+searchClassName(id): ClassName
+updateClassName(id, ClassNameDTO): ClassName
+deleteClassName(id): void
+
+Cardinalidades en las relaciones:
+Normativa N - 1 Autoridad
+Normativa N - 1 TipoDocumento
+Normativa N - 1 Archivo
+Normativa N - 1 Expediente
+Normativa 1 - N Notificación
+
+class Usuario	
+id: UUID
+name: string
+surname: string
+email: string
+password_hash: string
+must_change_password: boolean
+role: Enum
+
+Enum Role
+admin
+superadmin
+
+class Autoridad
+id: UUID
+name: string
+
+class Normativa	
+id: UUID
+number: int
+title: string
+description: string
+releaseDate: LocalDate
+loadDate: LocalDate
+visible: boolean
+text: string
+vector: pg_vector (maybe for db searching)
+accepted: boolean
+
+class Expediente
+id: UUID
+record_number: int
+record_title: string	
+
+class TipoDocumento	
+id: UUID
+name: string	
+
+class Notificacion
+id: UUID
+email: string	
+
+class Archivo	
+id: UUID
+path: string
+name: string
+size: int
+mime: string
+
+
+Título: Sistema de Digesto – Escuela de Comercio Martín Zapata
+Equipo: 5TACK
+Integrantes: Lucía Alvarez, Adriano Fabris, Paula Martínez, Agustín Olivares, Gonzalo Padilla
+Docentes: 
+Mgter, Elena Caliguli
+Ing. Lucía Cortés
+Inicio: 30 de Marzo de 2026
+Fin: 30 de Setiembre de 2026
+Universidad: Universidad Nacional de Cuyo
+Carrera: Licenciatura en Ciencias de la Computación
+Materia: Proyecto 1
+Cliente: Escuela de Comercio Martín Zapata
+Interesados:
+Lic. Ricardo Cayetano Mora (Dirección de Apoyo Académico) - Product Owner.
+Lic. Cristina Iriarte (Comunicación Digital Institucional) - intermediaria entre Instituciones.
+
+Características
+El sistema incluirá funcionalidades de gestión de documentos, usuarios y tipos de documentos, junto con una búsqueda avanzada por múltiples criterios. También incorporará notificaciones, diseño adaptable a distintos dispositivos y autogestión de cuentas administrativas.
+Quedan fuera del alcance la carga inicial de datos históricos y el mantenimiento posterior a la entrega.
+
+Estas son las historias de usuario del proyecto, describen bastante de la lógica del negocio, así que tenlas bien en cuenta.
+
+- Visualización de normativa
+Como usuario anónimo.
+Quiero ver UNA normativa.
+Criterios de aceptación:
+    Debe haber una página para ver UNA normativa.
+    Debe mostrarse toda la info de esa normativa, esta debe ser clara y completa
+    Debe poder descargar como pdf o abrir en una pestaña nueva
+    
+- Búsqueda de normativas
+Como usuario anónimo.
+Quiero buscar normativas con distintos filtros
+Criterios de aceptación:
+    Deben poder usarse distintos filtros
+    Debe haber paginación
+    Debe poder ordenarse por categorías
+    Mostrar resumen de cada normativa encontrada
+    En cada resultado, debe haber un botón para descargar pdf
+    
+- ABM de normativas
+Como admin o super admin.
+Quiero alta, baja, modificación normativas.
+Criterios de aceptación:
+    No se puede repetir la combinación de (año, número de normativa, tipo normativa).
+    Advertir si se está usando un número de expediente ya utilizado.
+    Validación de campos.
+    Confirmación para eliminar.
+    Si es admin (no super), queda a la espera de autorización por un super admin.
+    Si es modificación, alertar que la normativa quedará oculta hasta ser aprobada la modificación.
+
+- Aprobar carga de normativa
+Como super admin
+Quiero aprobar la carga de una normativa
+Criterios de aceptación:
+    Una vez aceptada, queda visible para el público.
+    
+- Login
+Como admin o super admin
+Quiero iniciar sesión con mail y contraseña
+Criterios de aceptación:
+    Se debe poder recuperar contraseña con el mail del usuario.
+    Una vez iniciada sesión, se debe mostrar la interfaz de administración apropiada al rol.
+    
+- ABM tipos de normativa
+Como admin o super admin
+Quiero alta, baja, modificación de tipos de normativa
+Criterios de aceptación:
+    No se pueden repetir nombres (no importa mayúscula / minúsculas), y remover espacios en blanco de los extremos.
+    No se pueden borrar si están referenciadas por alguna normativa.
+    Cargar algunas por defecto (disposición, res, circular).
+    
+- ABM autoridades
+Como admin o super admin
+Quiero alta, baja, modificación de autoridades
+Criterios de aceptación:
+    No se pueden repetir nombres (no importa mayúscula / minúsculas), y remover espacios en blanco de los extremos.
+    No se pueden borrar si están referenciadas por alguna normativa.
+    Cargar algunas por defecto.
+    
+- Envíar notificaciones por mail
+Como sistema
+Quiero enviar notificaciones por mail a direcciones de mail relevantes, cuando sea aprobada la carga y edición de una normativa.
+Criterios de aceptación:
+    Verificar que sean mails validos
+    Informar si falló alguna notificación
+    
+- Realizar backups
+Como super admin
+Quiero realizar un backup
+Criterios de aceptación:
+    Debe descargar un .zip con un dump de la base de datos, y los archivos almacenados en disco.
+    
+- Restaurar desde backup
+Como super admin
+Quiero restaurar desde backup
+Criterios de aceptación:
+    Debe proveerse el .zip de un backup previo
+    Se valida que el dump de la db sea correcto
+    Se valida que todos los documentos referenciados en la db existan en la sección de archivos del zip.
+    Se debe pedir una confirmación fehaciente.
+    
+- Enviar alerta de backup
+Como sistema
+Quiero recordarle a los superadmins que no se ha realizado un backup en 6 meses
+Criterios de aceptación:
+    Se muestra un mensaje de alerta en la pantalla luego del ingreso al sistema por parte de un superadmin
+    
+
+# **Documento de Especificación Final – Sistema de Digesto**
+
+## **1. Stack Tecnológico**
+
+- **Frontend:** React (SPA)
+- **Backend:** Java Spring Boot
+- **Base de datos:** PostgreSQL (con extensión `pg_vector` para búsqueda semántica)
+- **Despliegue:** Independiente del entorno; debe funcionar en cualquier servidor estándar. Sin costos adicionales por servicios externos.
+- **Correo:** Servicio SMTP gratuito (por ejemplo, Gmail SMTP o similar). Sin costos.
+- **Contenedores:** No especificado; se asume que no es obligatorio. Mantener simple.
+
+## **2. Roles y Autenticación**
+
+- **Roles:** Solo `admin` y `superadmin`. No se prevén más.
+- **Usuarios iniciales:**
+  - `admin` / contraseña: `admin`
+  - `superadmin` / contraseña: `superadmin`
+  - Ambos deben cambiar la contraseña en el primer inicio de sesión (`must_change_password = true`).
+- **Creación de usuarios:** Solo superadmin puede crear admin o superadmin. La contraseña inicial se genera automáticamente y se envía por correo; el nuevo usuario debe cambiarla en su primer login.
+- **Recuperación de contraseña:** Por enlace temporal enviado al correo.
+- **Seguridad de acceso:** Solo usuario y contraseña. No se requiere 2FA ni bloqueo por intentos fallidos (KISS). La sesión debe expirar tras un tiempo de inactividad razonablemente largo (estándar, ej. 30-60 minutos).
+- **Autenticación:** Basada en tokens (JWT) para la SPA, o sesiones con cookies. Decisión de implementación: usar JWT con Spring Security.
+
+## **3. Modelo de Datos Ajustado**
+
+Se mantienen las entidades definidas, con los siguientes refinamientos:
+
+- **Normativa**
+  - `number`: int
+  - `title`: string (obligatorio)
+  - `description`: string (resumen manual, obligatorio)
+  - `text`: string (extraído por OCR, no se muestra, solo para búsqueda)
+  - `releaseDate`: fecha de publicación original de la normativa (cuando se decretó)
+  - `loadDate`: fecha de carga al sistema (se asigna automáticamente)
+  - `visible`: boolean (indica si está visible al público; inicialmente `false` hasta aprobación)
+  - `accepted`: boolean (indica aprobación final por superadmin)
+  - `deleted`: boolean (borrado lógico)
+  - `vector`: pg_vector (representación semántica del texto para búsqueda)
+  - Relaciones:
+    - `autoridad`: ManyToOne → Autoridad (obligatorio)
+    - `tipoDocumento`: ManyToOne → TipoDocumento (obligatorio)
+    - `archivo`: OneToOne → Archivo (obligatorio)
+    - `expediente`: ManyToOne → Expediente (obligatorio, puede repetirse entre normativas)
+    - `notificaciones`: OneToMany → Notificacion (lista de correos asociados)
+
+- **Expediente**
+  - `record_number`: int
+  - `record_title`: string
+  - No es único; puede estar asociado a varias normativas (N-1). La advertencia por número ya usado solo informa, no bloquea.
+
+- **Archivo**
+  - `path`: string (ruta en disco)
+  - `name`: string (nombre original o generado)
+  - `size`: int
+  - `mime`: string
+  - Se sube manualmente al crear la normativa. A partir del PDF se extrae el texto con OCR para poblar `Normativa.text`.
+
+- **Notificacion**
+  - `email`: string (válido)
+  - Pertenece a una normativa específica.
+
+## **4. Flujo de Normativas**
+
+### Creación
+- Tanto admin como superadmin pueden crear normativas.
+- Al crear, se puede:
+  - Guardar como **borrador** (no se envía a aprobación, `accepted = false`, `visible = false`).
+  - Enviar a **aprobación** (queda pendiente, `accepted = false`, `visible = false`).
+- **Todos** los usuarios (incluido superadmin) deben pasar por el paso de aprobación. No se omite la aprobación para superadmin.
+- Validaciones:
+  - Unicidad de (año de `releaseDate`, `number`, `tipoDocumento`). No puede repetirse.
+  - Advertencia si el número de expediente ya fue usado, pero se permite continuar.
+  - Todos los campos obligatorios: título, número, tipo, autoridad, archivo, fecha de publicación, descripción, expediente (si aplica).
+- Al cargar, se ejecuta OCR sobre el PDF para llenar `text` y generar el vector para búsqueda.
+
+### Aprobación
+- Un superadmin revisa las normativas pendientes (`accepted = false`).
+- Puede aprobar o rechazar.
+- Si aprueba: `accepted = true`, `visible = true`. Se envían notificaciones por correo a la lista asociada.
+- Si rechaza: se notifica al creador por correo. La normativa permanece en estado borrador o puede eliminarse. (Definir si rechazar devuelve a borrador o se marca como rechazada; por simplicidad, queda como borrador con un flag de "rechazada" opcional o simplemente se informa).
+
+### Modificación
+- Al editar una normativa **ya aprobada y visible**:
+  - Se crea una versión modificada (o se edita la misma fila, pero se marca `visible = false` y `accepted = false`).
+  - La normativa desaparece de la vista pública hasta que sea aprobada nuevamente.
+  - Se alerta al usuario en la interfaz: "La normativa quedará oculta hasta que la modificación sea aprobada".
+- Si la modificación es rechazada, se descartan los cambios y se restaura la versión anterior (por simplicidad, se puede mantener un registro de auditoría con los valores anteriores o usar borrador separado).
+
+### Eliminación
+- Borrado lógico: se marca `deleted = true`.
+- No se elimina el archivo físico ni los registros asociados.
+- Se pide confirmación explícita antes de eliminar.
+- Una normativa eliminada no aparece en búsquedas ni en administración (salvo que se liste en papelera, opcional).
+
+## **5. Búsqueda de Normativas (Pública)**
+
+- **Filtros disponibles:**
+  - Tipo de normativa
+  - Año (basado en `releaseDate`)
+  - Número de normativa
+  - Autoridad
+  - Número de expediente
+  - Palabra clave (busca en título, descripción y texto extraído)
+  - Rango de fechas de publicación
+- **Búsqueda por texto:**
+  - Principalmente parcial (`LIKE`/ILIKE) en título/descripción.
+  - Adicionalmente, si `pg_vector` está disponible, se puede hacer búsqueda semántica para mejorar resultados.
+- **Ordenamiento:** por fecha de publicación, número, título (ascendente/descendente).
+- **Paginación:** tamaño de página por defecto decidido por el desarrollador (ej. 10 o 20). Se permite cambiar el tamaño.
+- **Resultados:** mostrar resumen con título, número, tipo, fecha y botón para abrir/descargar PDF.
+
+## **6. Visualización de Normativa**
+
+- Página de detalle pública muestra todos los metadatos: título, número, tipo, autoridad, expediente, fechas, descripción.
+- El PDF se abre en una pestaña nueva al hacer clic en un botón/enlace. No se incrusta.
+- El texto extraído por OCR **no** se muestra al público.
+
+## **7. Notificaciones por Correo**
+
+- Cada normativa tiene una lista de correos electrónicos (entidad `Notificacion`).
+- Al aprobar una normativa (nueva o modificación), se envían correos a esa lista.
+- Contenido del correo: plantilla estándar, con enlace a la normativa. El texto debe ser configurable por el administrador (ej. "Usted ha sido notificado...").
+- Si un correo falla (inválido, rebote), se registra el error y se continúa con los demás.
+- Los correos se validan al momento de agregarlos a la normativa (formato válido).
+
+## **8. Tipos de Normativa y Autoridades**
+
+- **Tipos de normativa** (ABM simple):
+  - Nombre único, normalizado (sin espacios en extremos, comparación case-insensitive).
+  - No se puede eliminar si está referenciado por alguna normativa.
+  - Se cargan algunos por defecto: disposición, resolución, circular.
+  - Se permite editar el nombre aunque esté referenciado (no rompe integridad).
+- **Autoridades** (ABM simple):
+  - Igual que tipos: nombre único normalizado, no eliminar si referenciado, carga por defecto.
+  - Se permite editar el nombre.
+- En ambos casos, la eliminación es física solo si no está referenciado; de lo contrario, se bloquea.
+
+## **9. Backups y Restauración**
+
+- **Backup manual:** desde interfaz de superadmin.
+- **Contenido del backup:** dump completo de la base de datos y todos los archivos almacenados en disco. Se empaqueta en un ZIP.
+- **Alerta de backup:** se muestra mensaje a superadmin si no se ha realizado backup en los últimos 6 meses. La fecha del último backup se registra en BD.
+- **Restauración:**
+  - Se provee un ZIP de backup previo.
+  - Se valida que el dump de BD sea correcto.
+  - Se valida que todos los archivos referenciados en la BD existan en el ZIP.
+  - Se pide confirmación con contraseña del superadmin.
+  - Reemplaza completamente los datos actuales (base de datos y archivos).
+
+## **10. Interfaz de Usuario**
+
+- **Sitio público:** similar al modelo [digesto.uncuyo.edu.ar/v3/](https://digesto.uncuyo.edu.ar/v3/), pero simplificado. Incluye:
+  - Página principal con buscador y listado de normativas.
+  - Página de detalle de normativa.
+- **Panel de administración:** React, con rutas protegidas según rol.
+  - Menú para normativas (listado, crear, editar, aprobar pendientes).
+  - Menú para tipos de normativa y autoridades.
+  - Menú para usuarios (solo superadmin).
+  - Menú para backups (solo superadmin).
+- **Diseño:** responsive, sin complicaciones. No se requiere modo oscuro.
+- **Idioma:** solo español.
+
+## **11. Auditoría y Seguridad**
+
+- Se registrará quién creó, modificó, aprobó o eliminó cada normativa (campos de auditoría: `created_by`, `updated_by`, `created_at`, `updated_at`). No se requiere tabla separada.
+- Contraseñas hasheadas con BCrypt.
+- Uso de JWT para autenticación de API.
+- HTTPS en producción (si está disponible, pero no es crítico para el desarrollo).
+
+## **12. Decisiones Pendientes Menores**
+
+- El OCR: ¿herramienta específica? (Tesseract, Apache PDFBox, etc.). El desarrollador puede elegir la más simple de integrar con Java.
+- Generación del vector `pg_vector`: ¿usar embeddings preentrenados (ej. sentence-transformers) o simplemente almacenar texto y usar búsqueda full-text? Por simplicidad, se puede empezar con `tsvector` y luego migrar a `pg_vector` si es necesario.
+- La restauración de backups: al ser reemplazo completo, ¿qué pasa con los archivos actuales que no están en el backup? Se asume que se eliminan. Confirmar con el cliente si es aceptable.
+- El flujo exacto de rechazo de modificaciones: se restaurará la versión anterior desde una copia temporal. Se implementará de forma simple guardando los valores anteriores en una tabla de auditoría o en el objeto de solicitud.
+
+---
+
+Este documento resume todas las decisiones tomadas a partir de las respuestas. Es suficiente para que la IA genere una arquitectura detallada y comience a guiar el desarrollo.

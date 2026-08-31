@@ -9,10 +9,12 @@ import java.util.UUID;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     boolean existsByEmailAndDeletedFalse(String email);
+
     boolean existsByEmailAndIdNotAndDeletedFalse(String email, UUID id);
 
     List<Usuario> findAllByDeletedFalseOrderByLastnameAsc();
 
     Optional<Usuario> findByIdAndDeletedFalse(UUID id);
+
     Optional<Usuario> findByEmailAndDeletedFalse(String email);
 }

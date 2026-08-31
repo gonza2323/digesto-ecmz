@@ -1,0 +1,256 @@
+<html><head><style id="reset-css"> @layer figreset,figoverridable,reset,theme,base,figutils,components,utilities;@layer figoverridable{:root{font-synthesis:none}}@layer figutils{:root{--banner-height:48px;--banner-height-v2:40px;--full-height-with-banner:calc(100dvh - var(--banner-height))}@media (max-width:600px){.banner-v2-container{left:0 !important;right:0 !important;margin:0 auto !important}}.wrapper-with-banner .min-h-screen{min-height:var(--full-height-with-banner)}.wrapper-with-banner .h-screen{height:var(--full-height-with-banner)}}</style><meta name="color-scheme" content="light dark"><style>
+  html, body, #container, #container > div {
+    height: 100%;
+  }
+</style><link rel="stylesheet" href="https://s3-figma-foundry-cached-previews-production-sig.figma.com/d840e3e4-6e72-4cfc-a0f1-185c524d00fa/index.css?Expires=1789344000&amp;Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&amp;Signature=bFPfNakTXEfcCdmgJww8qG5nJzzXj5gKa4C5IDq9VIg71b5oyAkTNrrThJ3SoLeGjp6jO6~lw9m1f1YPku8jNwUzRDJt7cOK3HhU1kSkUgPTn9jur8~Rcf8uY6d5mOnCaNMp8ka61k62RPsH6a--eAkdStPz~aWb4F75M7xL0jyDN9kt~fvPnAxolCpfmwlBnp4E5LN7BfZkHkzgIXnOlpn1k2MXQn-nITXgn4AdFmL05X1JTRNw3QfwcwVwQILc4JaoRgfjS5IhdcV65-r~ayWq8tu8UWr0yP6ErytiwWqjKsexQtU7uUhC5l7MD33JGyIYIc3iIjjH-RPipqdLcg__"></head><body>
+    <script>
+      window.coreMessagePort = null
+      window.messagePort = null
+
+      const allowedOrigins = [
+        'https://figma-gov.com',
+        'https://www.figma.com',
+        'https://staging.figma.com',
+        'https://devenv01.figma.engineering',
+        'https://local.figma.engineering:8443',
+        'http://localhost:9000',
+        'https://embed.figma.com',
+        'https://embed.figma-gov.com',
+        'https://embed.staging.figma.com',
+        'https://embed.sycamore.figma.com',
+        'https://embed.devenv01.figma.com',
+        'https://embed.local.figma.engineering:8443',
+      ]
+
+      const allowedOriginPatterns = [
+        /^https:\/\/[a-z0-9-]+\.figdev\.systems:8443$/,
+        /^https:\/\/[a-z0-9-]+\.figdev\.systems$/,
+      ]
+
+      function isAllowedOrigin(origin) {
+        return allowedOrigins.includes(origin) || allowedOriginPatterns.some((p) => p.test(origin))
+      }
+
+      let messageId = 0
+
+      window.addEventListener('message', (e) => {
+        function sendMessage(method, data) {
+          if (window.coreMessagePort) {
+            window.coreMessagePort.postMessage({
+              method: 'status',
+              args: data,
+              messageId: 0,
+            })
+            messageId++
+          }
+        }
+
+        if (isAllowedOrigin(e.origin)) {
+          if (e.data.type === 'iframe-init') {
+            window.coreMessagePort = e.ports[0]
+            window.messagePort = e.ports[1]
+
+            window.__PREVIEW_IFRAME_INITIAL_OPTIONS__ = e.data.previewIframeInitialOptions
+
+            sendMessage('status', {
+              state: 'init-received',
+              isReady: false,
+            })
+
+            if (e.data.initScriptBlob) {
+              import(URL.createObjectURL(e.data.initScriptBlob))
+            } else {
+              const script = document.createElement('script')
+
+              script.onload = async () => {
+                function sendReady() {
+                  sendMessage('status', {
+                    state: 'ready',
+                    isReady: true,
+                  })
+                }
+
+                if (window.__iframeScriptExecuted__) {
+                  sendReady()
+                  return
+                }
+
+                let executeInterval = null
+                let timeout = null
+
+                const timeoutPromise = new Promise((resolve) => {
+                  timeout = setTimeout(() => resolve('timeout'), 2000)
+                })
+
+                const scriptExecutedPromise = new Promise((resolve) => {
+                  executeInterval = setInterval(() => {
+                    if (window.__iframeScriptExecuted__) {
+                      resolve('ready')
+                    }
+                  }, 50)
+                })
+
+                const result = await Promise.race([timeoutPromise, scriptExecutedPromise])
+
+                clearTimeout(timeout)
+                clearInterval(executeInterval)
+
+                if (result === 'ready') {
+                  sendReady()
+                } else {
+                  sendMessage('status', {
+                    state: 'script-timeout',
+                    isReady: false,
+                  })
+                }
+              }
+
+              script.onerror = (e) => {
+                sendMessage('status', {
+                  state: 'script-load-error',
+                  isReady: false,
+                  error: e.message,
+                })
+              }
+
+              script.src = e.data.initScriptURL
+              // https://sentry.io/answers/script-error/
+              script.crossOrigin = 'anonymous'
+              document.body.appendChild(script)
+            }
+          }
+        }
+      })
+    </script>
+  
+
+<script src="https://www.figma.com/webpack-artifacts/assets/code_components_preview_iframe-8e5ca5610dfdda3a.min.js.br" crossorigin="anonymous"></script><div id="container"><div class="tailwind"><div id="fig-code-root" style="height: 100%;"><div class="min-h-screen bg-neutral-50"><header class="bg-[#0355a7] border-b border-[#024a91]"><div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4"><div class="flex items-center justify-between mb-3 sm:mb-4"><h1 class="text-lg sm:text-2xl font-semibold text-white">Digesto Escuela</h1><button class="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-white text-[#0355a7] rounded-lg hover:bg-neutral-100 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg><span class="hidden sm:inline">Iniciar sesión</span><span class="sm:hidden">Login</span></button></div><nav class="flex gap-1 sm:gap-2"><a class="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors bg-white text-[#0355a7]" href="/" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><span class="hidden sm:inline">Documentos</span><span class="sm:hidden">Docs</span></a><a class="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors text-white hover:bg-[#024a91]" href="/upload" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg><span class="hidden sm:inline">Cargar Documento</span><span class="sm:hidden">Cargar</span></a></nav></div></header><main class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8"><div class="mb-6 sm:mb-8"><div class="relative mb-3 sm:mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-neutral-400"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input type="text" placeholder="Buscar documentos..." class="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base bg-white border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0355a7] focus:border-transparent" value=""></div><button class="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-sm text-neutral-700 bg-white border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-funnel w-4 h-4"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"></path></svg>Filtros</button></div><div class="mb-3 sm:mb-4 text-sm text-neutral-600">6 documentos encontrados</div><div class="hidden md:block bg-white border border-neutral-200 rounded-lg overflow-hidden"><div class="overflow-x-auto"><table class="w-full"><thead><tr class="bg-[#0355a7] text-white"><th class="px-6 py-3 text-left text-sm font-medium">Título</th><th class="px-6 py-3 text-left text-sm font-medium">Tipo</th><th class="px-6 py-3 text-left text-sm font-medium">Categoría</th><th class="px-6 py-3 text-left text-sm font-medium">Fecha de Subida</th><th class="px-6 py-3 text-left text-sm font-medium">Tamaño</th><th class="px-6 py-3 text-left text-sm font-medium">Acciones</th></tr></thead><tbody class="divide-y divide-neutral-200"><tr class="hover:bg-neutral-50 transition-colors"><td class="px-6 py-4"><div class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div><div class="font-medium text-neutral-900">Reglamento Interno 2026</div><div class="text-sm text-neutral-500 mt-0.5">Reglamento interno actualizado para el ciclo lectivo 2026</div></div></div></td><td class="px-6 py-4"><span class="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-sm rounded">Reglamento</span></td><td class="px-6 py-4 text-sm text-neutral-600">Normativa General</td><td class="px-6 py-4 text-sm text-neutral-600"><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>9 de abril de 2026</div></td><td class="px-6 py-4 text-sm text-neutral-600">2.4 MB</td><td class="px-6 py-4"><button class="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></td></tr><tr class="hover:bg-neutral-50 transition-colors"><td class="px-6 py-4"><div class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div><div class="font-medium text-neutral-900">Protocolo de Convivencia Escolar</div><div class="text-sm text-neutral-500 mt-0.5">Lineamientos para la convivencia entre estudiantes y docentes</div></div></div></td><td class="px-6 py-4"><span class="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-sm rounded">Protocolo</span></td><td class="px-6 py-4 text-sm text-neutral-600">Convivencia</td><td class="px-6 py-4 text-sm text-neutral-600"><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>7 de abril de 2026</div></td><td class="px-6 py-4 text-sm text-neutral-600">1.8 MB</td><td class="px-6 py-4"><button class="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></td></tr><tr class="hover:bg-neutral-50 transition-colors"><td class="px-6 py-4"><div class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div><div class="font-medium text-neutral-900">Resolución 145/2026 - Sistema de Evaluación</div><div class="text-sm text-neutral-500 mt-0.5">Nuevos criterios de evaluación para nivel secundario</div></div></div></td><td class="px-6 py-4"><span class="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-sm rounded">Resolución</span></td><td class="px-6 py-4 text-sm text-neutral-600">Evaluación</td><td class="px-6 py-4 text-sm text-neutral-600"><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>4 de abril de 2026</div></td><td class="px-6 py-4 text-sm text-neutral-600">956 KB</td><td class="px-6 py-4"><button class="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></td></tr><tr class="hover:bg-neutral-50 transition-colors"><td class="px-6 py-4"><div class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div><div class="font-medium text-neutral-900">Calendario Escolar 2026</div><div class="text-sm text-neutral-500 mt-0.5">Fechas importantes del ciclo lectivo 2026</div></div></div></td><td class="px-6 py-4"><span class="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-sm rounded">Calendario</span></td><td class="px-6 py-4 text-sm text-neutral-600">Planificación</td><td class="px-6 py-4 text-sm text-neutral-600"><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>27 de marzo de 2026</div></td><td class="px-6 py-4 text-sm text-neutral-600">1.2 MB</td><td class="px-6 py-4"><button class="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></td></tr><tr class="hover:bg-neutral-50 transition-colors"><td class="px-6 py-4"><div class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div><div class="font-medium text-neutral-900">Manual de Procedimientos Administrativos</div><div class="text-sm text-neutral-500 mt-0.5">Guía de procedimientos para trámites administrativos</div></div></div></td><td class="px-6 py-4"><span class="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-sm rounded">Manual</span></td><td class="px-6 py-4 text-sm text-neutral-600">Administración</td><td class="px-6 py-4 text-sm text-neutral-600"><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>14 de marzo de 2026</div></td><td class="px-6 py-4 text-sm text-neutral-600">3.1 MB</td><td class="px-6 py-4"><button class="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></td></tr><tr class="hover:bg-neutral-50 transition-colors"><td class="px-6 py-4"><div class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div><div class="font-medium text-neutral-900">Acta de Acuerdo Docente</div><div class="text-sm text-neutral-500 mt-0.5">Acuerdos establecidos en reunión docente de marzo</div></div></div></td><td class="px-6 py-4"><span class="px-2.5 py-1 bg-neutral-100 text-neutral-700 text-sm rounded">Acta</span></td><td class="px-6 py-4 text-sm text-neutral-600">Acuerdos</td><td class="px-6 py-4 text-sm text-neutral-600"><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>9 de marzo de 2026</div></td><td class="px-6 py-4 text-sm text-neutral-600">645 KB</td><td class="px-6 py-4"><button class="flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></td></tr></tbody></table></div></div><div class="md:hidden space-y-3"><div class="bg-white border border-neutral-200 rounded-lg p-4"><div class="flex items-start gap-3 mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0 mt-0.5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div class="flex-1 min-w-0"><h3 class="font-medium text-neutral-900 text-sm mb-1">Reglamento Interno 2026</h3><p class="text-xs text-neutral-500 mb-2">Reglamento interno actualizado para el ciclo lectivo 2026</p><div class="flex flex-wrap gap-2 mb-2"><span class="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded">Reglamento</span><span class="text-xs text-neutral-500">Normativa General</span></div><div class="flex items-center gap-3 text-xs text-neutral-500 mb-3"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-3 h-3"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>9 de abril de 2026</span><span>2.4 MB</span></div></div></div><button class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></div><div class="bg-white border border-neutral-200 rounded-lg p-4"><div class="flex items-start gap-3 mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0 mt-0.5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div class="flex-1 min-w-0"><h3 class="font-medium text-neutral-900 text-sm mb-1">Protocolo de Convivencia Escolar</h3><p class="text-xs text-neutral-500 mb-2">Lineamientos para la convivencia entre estudiantes y docentes</p><div class="flex flex-wrap gap-2 mb-2"><span class="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded">Protocolo</span><span class="text-xs text-neutral-500">Convivencia</span></div><div class="flex items-center gap-3 text-xs text-neutral-500 mb-3"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-3 h-3"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>7 de abril de 2026</span><span>1.8 MB</span></div></div></div><button class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></div><div class="bg-white border border-neutral-200 rounded-lg p-4"><div class="flex items-start gap-3 mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0 mt-0.5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div class="flex-1 min-w-0"><h3 class="font-medium text-neutral-900 text-sm mb-1">Resolución 145/2026 - Sistema de Evaluación</h3><p class="text-xs text-neutral-500 mb-2">Nuevos criterios de evaluación para nivel secundario</p><div class="flex flex-wrap gap-2 mb-2"><span class="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded">Resolución</span><span class="text-xs text-neutral-500">Evaluación</span></div><div class="flex items-center gap-3 text-xs text-neutral-500 mb-3"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-3 h-3"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>4 de abril de 2026</span><span>956 KB</span></div></div></div><button class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></div><div class="bg-white border border-neutral-200 rounded-lg p-4"><div class="flex items-start gap-3 mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0 mt-0.5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div class="flex-1 min-w-0"><h3 class="font-medium text-neutral-900 text-sm mb-1">Calendario Escolar 2026</h3><p class="text-xs text-neutral-500 mb-2">Fechas importantes del ciclo lectivo 2026</p><div class="flex flex-wrap gap-2 mb-2"><span class="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded">Calendario</span><span class="text-xs text-neutral-500">Planificación</span></div><div class="flex items-center gap-3 text-xs text-neutral-500 mb-3"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-3 h-3"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>27 de marzo de 2026</span><span>1.2 MB</span></div></div></div><button class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></div><div class="bg-white border border-neutral-200 rounded-lg p-4"><div class="flex items-start gap-3 mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0 mt-0.5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div class="flex-1 min-w-0"><h3 class="font-medium text-neutral-900 text-sm mb-1">Manual de Procedimientos Administrativos</h3><p class="text-xs text-neutral-500 mb-2">Guía de procedimientos para trámites administrativos</p><div class="flex flex-wrap gap-2 mb-2"><span class="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded">Manual</span><span class="text-xs text-neutral-500">Administración</span></div><div class="flex items-center gap-3 text-xs text-neutral-500 mb-3"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-3 h-3"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>14 de marzo de 2026</span><span>3.1 MB</span></div></div></div><button class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></div><div class="bg-white border border-neutral-200 rounded-lg p-4"><div class="flex items-start gap-3 mb-3"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5 text-[#0355a7] flex-shrink-0 mt-0.5"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><div class="flex-1 min-w-0"><h3 class="font-medium text-neutral-900 text-sm mb-1">Acta de Acuerdo Docente</h3><p class="text-xs text-neutral-500 mb-2">Acuerdos establecidos en reunión docente de marzo</p><div class="flex flex-wrap gap-2 mb-2"><span class="px-2 py-0.5 bg-neutral-100 text-neutral-700 text-xs rounded">Acta</span><span class="text-xs text-neutral-500">Acuerdos</span></div><div class="flex items-center gap-3 text-xs text-neutral-500 mb-3"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-3 h-3"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>9 de marzo de 2026</span><span>645 KB</span></div></div></div><button class="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white bg-[#0355a7] rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>Descargar</button></div></div></main></div></div></div></div></body></html>
+
+
+<html><head><style id="reset-css"> @layer figreset,figoverridable,reset,theme,base,figutils,components,utilities;@layer figoverridable{:root{font-synthesis:none}}@layer figutils{:root{--banner-height:48px;--banner-height-v2:40px;--full-height-with-banner:calc(100dvh - var(--banner-height))}@media (max-width:600px){.banner-v2-container{left:0 !important;right:0 !important;margin:0 auto !important}}.wrapper-with-banner .min-h-screen{min-height:var(--full-height-with-banner)}.wrapper-with-banner .h-screen{height:var(--full-height-with-banner)}}</style><meta name="color-scheme" content="light dark"><style>
+  html, body, #container, #container > div {
+    height: 100%;
+  }
+</style><link rel="stylesheet" href="https://s3-figma-foundry-cached-previews-production-sig.figma.com/d840e3e4-6e72-4cfc-a0f1-185c524d00fa/index.css?Expires=1789344000&amp;Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&amp;Signature=bFPfNakTXEfcCdmgJww8qG5nJzzXj5gKa4C5IDq9VIg71b5oyAkTNrrThJ3SoLeGjp6jO6~lw9m1f1YPku8jNwUzRDJt7cOK3HhU1kSkUgPTn9jur8~Rcf8uY6d5mOnCaNMp8ka61k62RPsH6a--eAkdStPz~aWb4F75M7xL0jyDN9kt~fvPnAxolCpfmwlBnp4E5LN7BfZkHkzgIXnOlpn1k2MXQn-nITXgn4AdFmL05X1JTRNw3QfwcwVwQILc4JaoRgfjS5IhdcV65-r~ayWq8tu8UWr0yP6ErytiwWqjKsexQtU7uUhC5l7MD33JGyIYIc3iIjjH-RPipqdLcg__"></head><body>
+    <script>
+      window.coreMessagePort = null
+      window.messagePort = null
+
+      const allowedOrigins = [
+        'https://figma-gov.com',
+        'https://www.figma.com',
+        'https://staging.figma.com',
+        'https://devenv01.figma.engineering',
+        'https://local.figma.engineering:8443',
+        'http://localhost:9000',
+        'https://embed.figma.com',
+        'https://embed.figma-gov.com',
+        'https://embed.staging.figma.com',
+        'https://embed.sycamore.figma.com',
+        'https://embed.devenv01.figma.com',
+        'https://embed.local.figma.engineering:8443',
+      ]
+
+      const allowedOriginPatterns = [
+        /^https:\/\/[a-z0-9-]+\.figdev\.systems:8443$/,
+        /^https:\/\/[a-z0-9-]+\.figdev\.systems$/,
+      ]
+
+      function isAllowedOrigin(origin) {
+        return allowedOrigins.includes(origin) || allowedOriginPatterns.some((p) => p.test(origin))
+      }
+
+      let messageId = 0
+
+      window.addEventListener('message', (e) => {
+        function sendMessage(method, data) {
+          if (window.coreMessagePort) {
+            window.coreMessagePort.postMessage({
+              method: 'status',
+              args: data,
+              messageId: 0,
+            })
+            messageId++
+          }
+        }
+
+        if (isAllowedOrigin(e.origin)) {
+          if (e.data.type === 'iframe-init') {
+            window.coreMessagePort = e.ports[0]
+            window.messagePort = e.ports[1]
+
+            window.__PREVIEW_IFRAME_INITIAL_OPTIONS__ = e.data.previewIframeInitialOptions
+
+            sendMessage('status', {
+              state: 'init-received',
+              isReady: false,
+            })
+
+            if (e.data.initScriptBlob) {
+              import(URL.createObjectURL(e.data.initScriptBlob))
+            } else {
+              const script = document.createElement('script')
+
+              script.onload = async () => {
+                function sendReady() {
+                  sendMessage('status', {
+                    state: 'ready',
+                    isReady: true,
+                  })
+                }
+
+                if (window.__iframeScriptExecuted__) {
+                  sendReady()
+                  return
+                }
+
+                let executeInterval = null
+                let timeout = null
+
+                const timeoutPromise = new Promise((resolve) => {
+                  timeout = setTimeout(() => resolve('timeout'), 2000)
+                })
+
+                const scriptExecutedPromise = new Promise((resolve) => {
+                  executeInterval = setInterval(() => {
+                    if (window.__iframeScriptExecuted__) {
+                      resolve('ready')
+                    }
+                  }, 50)
+                })
+
+                const result = await Promise.race([timeoutPromise, scriptExecutedPromise])
+
+                clearTimeout(timeout)
+                clearInterval(executeInterval)
+
+                if (result === 'ready') {
+                  sendReady()
+                } else {
+                  sendMessage('status', {
+                    state: 'script-timeout',
+                    isReady: false,
+                  })
+                }
+              }
+
+              script.onerror = (e) => {
+                sendMessage('status', {
+                  state: 'script-load-error',
+                  isReady: false,
+                  error: e.message,
+                })
+              }
+
+              script.src = e.data.initScriptURL
+              // https://sentry.io/answers/script-error/
+              script.crossOrigin = 'anonymous'
+              document.body.appendChild(script)
+            }
+          }
+        }
+      })
+    </script>
+  
+
+<script src="https://www.figma.com/webpack-artifacts/assets/code_components_preview_iframe-8e5ca5610dfdda3a.min.js.br" crossorigin="anonymous"></script><div id="container"><div class="tailwind"><div id="fig-code-root" style="height: 100%;"><div class="min-h-screen bg-neutral-50"><header class="bg-[#0355a7] border-b border-[#024a91]"><div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4"><div class="flex items-center justify-between mb-3 sm:mb-4"><h1 class="text-lg sm:text-2xl font-semibold text-white">Digesto Escuela</h1><button class="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-white text-[#0355a7] rounded-lg hover:bg-neutral-100 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" x2="3" y1="12" y2="12"></line></svg><span class="hidden sm:inline">Iniciar sesión</span><span class="sm:hidden">Login</span></button></div><nav class="flex gap-1 sm:gap-2"><a class="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors text-white hover:bg-[#024a91]" href="/" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><span class="hidden sm:inline">Documentos</span><span class="sm:hidden">Docs</span></a><a class="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors bg-white text-[#0355a7]" href="/upload" data-discover="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-3.5 h-3.5 sm:w-4 sm:h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg><span class="hidden sm:inline">Cargar Documento</span><span class="sm:hidden">Cargar</span></a></nav></div></header><main class="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8"><div class="mb-4 sm:mb-6"><h2 class="text-xl sm:text-2xl font-semibold text-neutral-900">Cargar Nuevo Documento</h2><p class="text-xs sm:text-sm text-neutral-600 mt-1">Complete los campos para agregar un documento al digesto</p></div><form class="bg-white border border-neutral-200 rounded-lg p-4 sm:p-6 space-y-4 sm:space-y-6"><div><label class="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">Documento *</label><div class="relative"><input type="file" class="hidden" id="file-upload" accept=".pdf,.doc,.docx" required=""><label for="file-upload" class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 w-full px-4 py-6 sm:py-8 border-2 border-dashed border-neutral-300 rounded-lg hover:border-[#0355a7] transition-colors cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload w-5 h-5 sm:w-6 sm:h-6 text-neutral-400"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" x2="12" y1="3" y2="15"></line></svg><div class="text-center"><div><p class="text-xs sm:text-sm font-medium text-neutral-700">Click para subir archivo</p><p class="text-xs text-neutral-500 mt-1">PDF, DOC, DOCX (máx. 10MB)</p></div></div></label></div></div><div><label for="title" class="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">Título *</label><input type="text" id="title" name="title" required="" placeholder="Ej: Reglamento Interno 2026" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0355a7] focus:border-transparent" value=""></div><div><label for="type" class="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">Tipo de Documento *</label><select id="type" name="type" required="" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0355a7] focus:border-transparent"><option value="">Seleccione un tipo</option><option value="Reglamento">Reglamento</option><option value="Protocolo">Protocolo</option><option value="Resolución">Resolución</option><option value="Calendario">Calendario</option><option value="Manual">Manual</option><option value="Acta">Acta</option></select></div><div><label for="issuingEntity" class="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">Entidad Emisora *</label><input type="text" id="issuingEntity" name="issuingEntity" required="" placeholder="Ej: Ministerio de Educación" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0355a7] focus:border-transparent" value=""></div><div><label for="documentNumber" class="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">Número de Normativa/Acta</label><input type="text" id="documentNumber" name="documentNumber" placeholder="Ej: 145/2026" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0355a7] focus:border-transparent" value=""></div><div><label for="documentDate" class="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">Fecha del Documento *</label><div class="relative"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar absolute left-3 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-neutral-400"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg><input type="date" id="documentDate" name="documentDate" required="" class="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-sm sm:text-base border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0355a7] focus:border-transparent" value=""></div></div><div class="flex items-center gap-3"><input type="checkbox" id="publishDirectly" name="publishDirectly" class="w-4 h-4 text-[#0355a7] border-neutral-300 rounded focus:ring-[#0355a7]"><label for="publishDirectly" class="text-xs sm:text-sm font-medium text-neutral-700">Publicar directamente</label></div><div class="flex items-center gap-3"><input type="checkbox" id="sendEmail" name="sendEmail" class="w-4 h-4 text-[#0355a7] border-neutral-300 rounded focus:ring-[#0355a7]"><label for="sendEmail" class="text-xs sm:text-sm font-medium text-neutral-700 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-3.5 sm:w-4 h-3.5 sm:h-4"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>Enviar notificación por email</label></div><div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 sm:gap-3 pt-4 border-t border-neutral-200"><button type="button" class="px-4 sm:px-6 py-2 text-sm sm:text-base text-neutral-700 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors">Cancelar</button><button type="submit" class="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 text-sm sm:text-base bg-[#0355a7] text-white rounded-lg hover:bg-[#024a91] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-4 h-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Cargar Documento</button></div></form></main></div></div></div></div></body></html>

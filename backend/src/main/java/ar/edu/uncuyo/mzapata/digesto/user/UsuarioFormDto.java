@@ -9,4 +9,5 @@ public record UsuarioFormDto(
         @NotBlank(message = "Ingrese el apellido") String lastname,
         @NotBlank(message = "Ingrese el email") @Email(message = "Ingrese un email válido") String email,
         @NotNull(message = "Seleccione el rol") UserRole role
-) {}
+) {
+}

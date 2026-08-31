@@ -32,7 +32,9 @@ public class UsuarioService {
                 .orElseThrow(() -> BusinessException.notFound("El usuario no existe"));
     }
 
-    /** Crea el usuario con una contraseña generada que se envía por correo. */
+    /**
+     * Crea el usuario con una contraseña generada que se envía por correo.
+     */
     @Transactional
     public UsuarioDto create(UsuarioFormDto dto) {
         String email = dto.email().trim().toLowerCase();

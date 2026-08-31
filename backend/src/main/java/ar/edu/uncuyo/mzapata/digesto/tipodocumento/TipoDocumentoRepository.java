@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface TipoDocumentoRepository extends JpaRepository<TipoDocumento, UUID> {
     boolean existsByNameIgnoreCase(String name);
+
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
+
     List<TipoDocumento> findAllByOrderByNameAsc();
 }

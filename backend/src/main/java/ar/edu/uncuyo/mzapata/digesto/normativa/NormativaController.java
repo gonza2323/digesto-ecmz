@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-/** Sitio público: sólo normativas aprobadas y visibles. */
+/**
+ * Sitio público: sólo normativas aprobadas y visibles.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/normativas")

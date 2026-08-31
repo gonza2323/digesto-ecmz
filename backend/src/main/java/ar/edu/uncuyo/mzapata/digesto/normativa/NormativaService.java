@@ -12,7 +12,6 @@ import ar.edu.uncuyo.mzapata.digesto.mail.MailService;
 import ar.edu.uncuyo.mzapata.digesto.setting.AppSettingService;
 import ar.edu.uncuyo.mzapata.digesto.tipodocumento.TipoDocumentoService;
 import ar.edu.uncuyo.mzapata.digesto.user.UsuarioRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -45,13 +45,17 @@ public class NormativaService {
 
     // ---------- Consulta ----------
 
-    /** Búsqueda del sitio público: sólo normativas aprobadas y visibles. */
+    /**
+     * Búsqueda del sitio público: sólo normativas aprobadas y visibles.
+     */
     @Transactional(readOnly = true)
     public Page<NormativaSummaryDto> search(NormativaFilterDto filtro, Pageable pageable) {
         return query(filtro, true, false, pageable);
     }
 
-    /** Búsqueda de administración: incluye borradores y pendientes. */
+    /**
+     * Búsqueda de administración: incluye borradores y pendientes.
+     */
     @Transactional(readOnly = true)
     public Page<NormativaSummaryDto> searchAdmin(NormativaFilterDto filtro, boolean soloPendientes, Pageable pageable) {
         return query(filtro, false, soloPendientes, pageable);
@@ -84,19 +88,25 @@ public class NormativaService {
         return NormativaDetailDto.ofAdmin(require(id));
     }
 
-    /** Archivo de una normativa publicada. */
+    /**
+     * Archivo de una normativa publicada.
+     */
     @Transactional(readOnly = true)
     public Archivo archivoPublic(UUID id) {
         return requirePublic(id).getArchivo();
     }
 
-    /** Archivo de cualquier normativa, para que el superadmin pueda revisarla antes de aprobar. */
+    /**
+     * Archivo de cualquier normativa, para que el superadmin pueda revisarla antes de aprobar.
+     */
     @Transactional(readOnly = true)
     public Archivo archivoAdmin(UUID id) {
         return require(id).getArchivo();
     }
 
-    /** Informa si el número de expediente ya se usó, para advertir sin bloquear la carga. */
+    /**
+     * Informa si el número de expediente ya se usó, para advertir sin bloquear la carga.
+     */
     @Transactional(readOnly = true)
     public boolean expedienteEnUso(Integer recordNumber) {
         return normativaRepository.existsByExpedienteRecordNumberAndDeletedFalse(recordNumber);
@@ -164,7 +174,9 @@ public class NormativaService {
         return NormativaDetailDto.ofAdmin(normativa);
     }
 
-    /** Baja lógica: no se borra el archivo ni los registros asociados. */
+    /**
+     * Baja lógica: no se borra el archivo ni los registros asociados.
+     */
     @Transactional
     public void delete(UUID id) {
         Normativa normativa = require(id);
@@ -244,7 +256,9 @@ public class NormativaService {
                         .build()));
     }
 
-    /** Envía los correos asociados y devuelve las direcciones que fallaron. */
+    /**
+     * Envía los correos asociados y devuelve las direcciones que fallaron.
+     */
     private List<String> notificar(Normativa normativa) {
         String asunto = appSettingService.get(AppSettingService.MAIL_SUBJECT, AppSettingService.DEFAULT_MAIL_SUBJECT);
         String cuerpo = appSettingService.get(AppSettingService.MAIL_BODY, AppSettingService.DEFAULT_MAIL_BODY)

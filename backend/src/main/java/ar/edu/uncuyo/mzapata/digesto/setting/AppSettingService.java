@@ -16,9 +16,9 @@ public class AppSettingService {
             "Digesto Escuela de Comercio Martín Zapata - Nueva normativa publicada";
     public static final String DEFAULT_MAIL_BODY = """
             Usted ha sido notificado de la publicación de la siguiente normativa:
-
+            
             {titulo}
-
+            
             Puede consultarla en: {enlace}
             """;
 

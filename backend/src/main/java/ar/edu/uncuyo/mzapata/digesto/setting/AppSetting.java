@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Parámetro editable del sistema (plantilla de correo, fecha del último backup). */
+/**
+ * Parámetro editable del sistema (plantilla de correo, fecha del último backup).
+ */
 @Entity
 @Table(name = "app_setting")
 @Getter

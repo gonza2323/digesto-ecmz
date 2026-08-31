@@ -1,6 +1,6 @@
 package ar.edu.uncuyo.mzapata.digesto.backup;
 
-import ar.edu.uncuyo.mzapata.digesto.auth.CurrentUser;
+import ar.edu.uncuyo.mzapata.digesto.auth.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -46,7 +46,7 @@ public class BackupController {
     @PostMapping("/restaurar")
     public void restaurar(@RequestPart MultipartFile archivo,
                           @RequestParam String password,
-                          @AuthenticationPrincipal CurrentUser user) {
+                          @AuthenticationPrincipal CustomUserDetails user) {
         backupService.restore(archivo, password, user.getId());
     }
 }

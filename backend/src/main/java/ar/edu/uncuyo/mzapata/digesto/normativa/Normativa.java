@@ -6,11 +6,7 @@ import ar.edu.uncuyo.mzapata.digesto.entity.BaseEntity;
 import ar.edu.uncuyo.mzapata.digesto.expediente.Expediente;
 import ar.edu.uncuyo.mzapata.digesto.tipodocumento.TipoDocumento;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,7 +29,9 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class Normativa extends BaseEntity {
 
-    /** Número propio de la normativa: único por (año de publicación, número, tipo). */
+    /**
+     * Número propio de la normativa: único por (año de publicación, número, tipo).
+     */
     @Column(nullable = false)
     private Integer number;
 
@@ -43,15 +41,21 @@ public class Normativa extends BaseEntity {
     @Column(nullable = false, length = 2000)
     private String description;
 
-    /** Texto extraído del PDF. No se muestra al público, sólo alimenta la búsqueda. */
+    /**
+     * Texto extraído del PDF. No se muestra al público, sólo alimenta la búsqueda.
+     */
     @Column(columnDefinition = "text")
     private String text;
 
-    /** Fecha en que se decretó la normativa. */
+    /**
+     * Fecha en que se decretó la normativa.
+     */
     @Column(nullable = false)
     private LocalDate releaseDate;
 
-    /** Fecha de carga al sistema. */
+    /**
+     * Fecha de carga al sistema.
+     */
     @Column(nullable = false)
     private LocalDate loadDate;
 
@@ -59,10 +63,14 @@ public class Normativa extends BaseEntity {
 
     private boolean accepted;
 
-    /** Enviada a aprobación; si es false y no está aceptada, es un borrador. */
+    /**
+     * Enviada a aprobación; si es false y no está aceptada, es un borrador.
+     */
     private boolean pendingApproval;
 
-    /** Copia JSON de los valores previos, para poder deshacer una modificación rechazada. */
+    /**
+     * Copia JSON de los valores previos, para poder deshacer una modificación rechazada.
+     */
     @Column(columnDefinition = "text")
     private String previousVersion;
 

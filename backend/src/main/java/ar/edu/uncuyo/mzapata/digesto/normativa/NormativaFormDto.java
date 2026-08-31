@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/** Datos con los que se crea o modifica una normativa. El PDF viaja aparte, como multipart. */
+/**
+ * Datos con los que se crea o modifica una normativa. El PDF viaja aparte, como multipart.
+ */
 public record NormativaFormDto(
         @NotNull(message = "Ingrese el número de la normativa")
         @Positive(message = "El número debe ser mayor a cero")
@@ -41,4 +43,5 @@ public record NormativaFormDto(
 
         /** false guarda como borrador; true la envía a aprobación. */
         boolean enviarAAprobacion
-) {}
+) {
+}

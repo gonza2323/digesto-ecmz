@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-/** Dirección de correo a la que se avisa cuando se aprueba la normativa. */
+/**
+ * Dirección de correo a la que se avisa cuando se aprueba la normativa.
+ */
 @Entity
 @Getter
 @Setter

@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface AutoridadRepository extends JpaRepository<Autoridad, UUID> {
     boolean existsByNameIgnoreCase(String name);
+
     boolean existsByNameIgnoreCaseAndIdNot(String name, UUID id);
+
     List<Autoridad> findAllByOrderByNameAsc();
 }

@@ -23,7 +23,9 @@ public class PasswordService {
     private final MailService mailService;
     private final AppProperties properties;
 
-    /** Cambio de contraseña del propio usuario (también cubre el cambio obligatorio del primer ingreso). */
+    /**
+     * Cambio de contraseña del propio usuario (también cubre el cambio obligatorio del primer ingreso).
+     */
     @Transactional
     public void change(UUID userId, ChangePasswordDto dto) {
         Usuario usuario = usuarioRepository.findByIdAndDeletedFalse(userId)
@@ -36,7 +38,9 @@ public class PasswordService {
         usuario.setMustChangePassword(false);
     }
 
-    /** Envía el enlace de recuperación. No revela si el email existe. */
+    /**
+     * Envía el enlace de recuperación. No revela si el email existe.
+     */
     @Transactional
     public void forgot(ForgotPasswordDto dto) {
         usuarioRepository.findByEmailAndDeletedFalse(dto.email().trim().toLowerCase()).ifPresent(usuario -> {
