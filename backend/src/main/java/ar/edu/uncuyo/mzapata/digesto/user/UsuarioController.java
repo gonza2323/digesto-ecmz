@@ -79,4 +79,20 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/primer-ingreso")
+    public ResponseEntity<UsuarioDetailDto> firstLogIn(@AuthenticationPrincipal CurrentUser currentUser, @RequestParam String newPassword){
+        try {
+            if (currentUser != null) {
+                String id = currentUser.getName();
+                return ResponseEntity.ok(userService.firstLogIn(id, newPassword));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    
+
 }

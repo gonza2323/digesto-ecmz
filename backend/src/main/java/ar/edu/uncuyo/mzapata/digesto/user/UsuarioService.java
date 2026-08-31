@@ -3,8 +3,10 @@ package ar.edu.uncuyo.mzapata.digesto.user;
 import ar.edu.uncuyo.mzapata.digesto.bussinesException.BusinessException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +16,7 @@ import java.util.UUID;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     //TODO: Decidir la creacion por defecto de la contraseña, y aplicar job para mandar contraseña por email
@@ -62,7 +65,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    //TODO: Mejorar mensaje de error
+    //TODO: Mejorar mensaje de error, hacer un update dedicado para la contraseña
     public UsuarioDetailDto actualizarUsuario(String id, UsuarioRequestDto newData){
         Optional<Usuario> usuarioActual = repository.findByIdAndDeletedFalse(UUID.fromString(id));
 
@@ -81,13 +84,40 @@ public class UsuarioService {
         usuarioActual.get().setFirstname(newData.getFirstname());
         usuarioActual.get().setLastname(newData.getLastname());
         usuarioActual.get().setEmail(newData.getEmail());
-        usuarioActual.get().setPasswordHash(newData.getPassword());
 
         repository.save(usuarioActual.get());
         return toDetailDto(usuarioActual.get());
     }
 
-    // =========== Funciones De Utilidad ===========
+    @Transactional
+    //TODO: En iteracion futura agregar la encriptacion de claves
+    public UsuarioDetailDto firstLogIn(String id, String newPassword) { //funcion para primer ingreso
+        Optional<Usuario> usuario = repository.findByIdAndDeletedFalse(UUID.fromString(id));
+        if (usuario.isPresent()){
+
+            //valido que no este vacia ni sean solo espacios en blanco
+            if (newPassword.isBlank() || newPassword.isEmpty()){
+                throw new BusinessException("La contraseña no puede estar vacia");
+            }
+
+            String oldPassword = usuario.get().getPasswordHash(); //recordar que sera un hash
+
+            //valido que no deje igual la contrasenia
+            if (Objects.equals(oldPassword, newPassword)){
+                throw new BusinessException("La contraseña debe ser distinta");
+            }
+
+            usuario.get().setPasswordHash(newPassword);
+            usuario.get().setMustChangePassword(false);
+            repository.save(usuario.get());
+
+            return toDetailDto(usuario.get());
+        } else {
+            throw new RuntimeException("No existe el usuario");
+        }
+    }
+
+    // ====================== Funciones De Utilidad ======================
 
     //Valido Campos
     //TODO: Mejorar la validacion del email y revisar
@@ -110,16 +140,20 @@ public class UsuarioService {
                 .role(usuario.getRole())
                 .build();
     }
-    //validacion de campos para el update
+    //validacion de campos para el update, creo que conviene dejar por separado el update de la contraseña
     private boolean validarUpdate(UsuarioRequestDto dto, UUID id){
         if (dto.getFirstname() == null || dto.getFirstname().isBlank()
                 || dto.getLastname() == null || dto.getLastname().isBlank()
-                || dto.getEmail() == null || dto.getEmail().isBlank()
-                || dto.getPassword() == null || dto.getPassword().isBlank() ) {
+                || dto.getEmail() == null || dto.getEmail().isBlank()) {
             return false;
         }
         return !repository.existsByEmailAndIdNotAndDeletedFalse(dto.getEmail(), id);
     }
+
+    //    //funcion para emparejar los datos ingresados por el usuario en funciones de utilidad
+    //    private UsuarioDetailDto formatData(UsuarioDetailDto dto){
+    //
+    //    }
 
 
 }
