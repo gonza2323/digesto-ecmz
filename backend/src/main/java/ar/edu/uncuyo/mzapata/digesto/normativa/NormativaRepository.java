@@ -21,4 +21,8 @@ public interface NormativaRepository extends JpaRepository<Normativa, UUID> {
     WHERE n.deleted = false
 """)
     Page<NormativaSummaryDTO> listNormativasSummaries(Pageable pageable);
+
+    // ?1[0] = nro, ?1[1] = emisionDate, ?1[2] = tipoNormativa
+    @Query("SELECT n FROM Normativa n WHERE n.nro = ?1[0] AND n.emisionDate = ?1[1] AND n.tipoNormativa = ?1[2]")
+    Optional<Normativa> findByDetails(List<Object> details);
 }
