@@ -46,10 +46,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/carta").permitAll()
-                        .requestMatchers("/api/resenias").permitAll()
-                        .requestMatchers("/api/items-carta/*/imagen", "/api/personas/*/imagen").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/webhook/mercadopago").permitAll()
+                        .requestMatchers("/api/normativas/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
