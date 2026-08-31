@@ -1,5 +1,6 @@
 package ar.edu.uncuyo.mzapata.digesto.user;
 
+import ar.edu.uncuyo.mzapata.digesto.bussinesException.BusinessException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ public class UsuarioService {
     private final UsuarioRepository repository;
 
     @Transactional
-    //TODO: Decidir la creacion por defecto de la contraseña
+    //TODO: Decidir la creacion por defecto de la contraseña, y aplicar job para mandar contraseña por email
     public Usuario crearUsuario(UsuarioDetailDto dto) {
 
         if (!validarCreate(dto)) {
@@ -42,6 +43,13 @@ public class UsuarioService {
         usuarioActual.setDeleted(true);
     }
 
+    @Transactional
+    public UsuarioDetailDto searchUsuario(String email) {
+        return repository.findByEmailAndDeletedFalse(email)
+                .map(this::toDetailDto)
+                .orElseThrow(() -> new BusinessException("No se pudo encontrar al usuario"));
+    }
+
     //Valido Campos
     //TODO: Mejorar la validacion del email y revisar
     private boolean validarCreate(UsuarioDetailDto dto) {
@@ -51,5 +59,16 @@ public class UsuarioService {
             return false;
         }
         return !repository.existsByEmailAndDeletedFalse(dto.getEmail());
+    }
+
+    //Mapper para datos del usuario
+    private UsuarioDetailDto toDetailDto(Usuario usuario) {
+        return UsuarioDetailDto.builder()
+                .id(usuario.getId())
+                .firstname(usuario.getFirstname())
+                .lastname(usuario.getLastname())
+                .email(usuario.getEmail())
+                .role(usuario.getRole())
+                .build();
     }
 }

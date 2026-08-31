@@ -36,4 +36,16 @@ public class UsuarioController {
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping("/buscar/{email}")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    public ResponseEntity<UsuarioDetailDto> searchUsuario(@PathVariable String email) {
+        try {
+            return ResponseEntity.ok(userService.searchUsuario(email));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+
 }
