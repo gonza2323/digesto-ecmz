@@ -31,3 +31,27 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Datos locales y archivos subidos
+data/
+uploads/
+storage/
+*.zip
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Backups locales
+*.bak
+*~

@@ -3,34 +3,34 @@
 @tailwind utilities;
 
 html {
-  scroll-padding-top: 5rem;
+    scroll-padding-top: 5rem;
 }
 
 body {
-  @apply bg-neutral-50 text-neutral-900 antialiased;
-  font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+    @apply bg-neutral-50 text-neutral-900 antialiased;
+    font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
 }
 
 h1,
 h2,
 h3,
 .font-display {
-  font-family: 'Source Serif 4', Georgia, serif;
+    font-family: 'Source Serif 4', Georgia, serif;
 }
 
 /* Visible keyboard focus everywhere, matching the institutional blue */
 :focus-visible {
-  outline: 2px solid #0355a7;
-  outline-offset: 2px;
+    outline: 2px solid #0355a7;
+    outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

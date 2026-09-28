@@ -155,8 +155,8 @@ public class BackupService {
             try (ZipFile zip = new ZipFile(zipPath.toFile())) {
                 dumpPath = validarYExtraerDump(zip);
                 validarArchivosReferenciados(zip);
+                validarRutasArchivos(zip);
 
-                runPsqlResetSchema();
                 runPsqlRestore(dumpPath);
                 reemplazarArchivos(zip);
             }
@@ -218,31 +218,51 @@ public class BackupService {
                     + " archivo(s) referenciados por la base de datos: " + String.join(", ", faltantes));
     }
 
+    private void validarRutasArchivos(ZipFile zip) {
+        var entries = zip.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            if (!entry.getName().startsWith(FILES_PREFIX)) continue;
+
+            Path ruta = Path.of(entry.getName().substring(FILES_PREFIX.length())).normalize();
+            if (ruta.isAbsolute() || ruta.startsWith(".."))
+                throw new BusinessException("El ZIP contiene una ruta inválida: " + entry.getName());
+        }
+    }
+
     // ---------- Ejecución de pg_dump / psql ----------
 
     private void reemplazarArchivos(ZipFile zip) throws IOException {
         Path dir = archivoService.storageDir();
-        if (Files.exists(dir)) {
-            try (var paths = Files.walk(dir)) {
-                paths.sorted(Comparator.reverseOrder())
-                        .filter(path -> !path.equals(dir))
-                        .forEach(BackupService::deleteQuietly);
+        Files.createDirectories(dir.getParent());
+        Path staging = Files.createTempDirectory(dir.getParent(), "digesto-restore-files-");
+
+        try {
+            var entries = zip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.isDirectory() || !entry.getName().startsWith(FILES_PREFIX)) continue;
+
+                Path destino = staging.resolve(entry.getName().substring(FILES_PREFIX.length())).normalize();
+                if (!destino.startsWith(staging))
+                    throw new BusinessException("El ZIP contiene una ruta inválida: " + entry.getName());
+
+                Files.createDirectories(destino.getParent());
+                try (InputStream in = zip.getInputStream(entry)) {
+                    Files.copy(in, destino, StandardCopyOption.REPLACE_EXISTING);
+                }
             }
-        }
-        Files.createDirectories(dir);
 
-        var entries = zip.entries();
-        while (entries.hasMoreElements()) {
-            ZipEntry entry = entries.nextElement();
-            if (entry.isDirectory() || !entry.getName().startsWith(FILES_PREFIX)) continue;
-
-            Path destino = dir.resolve(entry.getName().substring(FILES_PREFIX.length())).normalize();
-            if (!destino.startsWith(dir))
-                throw new BusinessException("El ZIP contiene una ruta inválida: " + entry.getName());
-
-            try (InputStream in = zip.getInputStream(entry)) {
-                Files.copy(in, destino, StandardCopyOption.REPLACE_EXISTING);
+            if (Files.exists(dir)) {
+                try (var paths = Files.walk(dir)) {
+                    paths.sorted(Comparator.reverseOrder())
+                            .forEach(BackupService::deleteQuietly);
+                }
             }
+            Files.move(staging, dir);
+        } catch (IOException | RuntimeException e) {
+            deleteQuietly(staging);
+            throw e;
         }
     }
 
@@ -256,17 +276,6 @@ public class BackupService {
                 "--clean", "--if-exists", "--no-owner", "--no-privileges"), salida);
     }
 
-    private void runPsqlResetSchema() {
-        Matcher conexion = conexion();
-        run(List.of(properties.backup().psql(),
-                "-h", conexion.group(1),
-                "-p", conexion.group(2),
-                "-U", datasourceUsername,
-                "-d", conexion.group(3),
-                "-v", "ON_ERROR_STOP=1",
-                "-c", "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"), null);
-    }
-
     private void runPsqlRestore(Path dump) {
         Matcher conexion = conexion();
         run(List.of(properties.backup().psql(),
@@ -275,6 +284,7 @@ public class BackupService {
                 "-U", datasourceUsername,
                 "-d", conexion.group(3),
                 "-v", "ON_ERROR_STOP=1",
+                "--single-transaction",
                 "-f", dump.toAbsolutePath().toString()), null);
     }
 

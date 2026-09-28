@@ -13,7 +13,6 @@ import ar.edu.uncuyo.mzapata.digesto.setting.AppSettingService;
 import ar.edu.uncuyo.mzapata.digesto.tipodocumento.TipoDocumentoService;
 import ar.edu.uncuyo.mzapata.digesto.user.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NormativaService {

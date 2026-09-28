@@ -15,7 +15,8 @@ public record AppProperties(
         Backup backup
 ) {
     public record Auth(PasswordReset passwordReset) {
-        public record PasswordReset(long durationMinutes) {}
+        public record PasswordReset(long durationMinutes) {
+        }
     }
 
     /**
