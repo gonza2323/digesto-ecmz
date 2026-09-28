@@ -3,6 +3,7 @@ package ar.edu.uncuyo.mzapata.digesto.config;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,9 +31,9 @@ public class ApiExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.toMap(
-                        e -> e.getField(),
+                        FieldError::getField,
                         e -> e.getDefaultMessage() == null ? "Valor inválido" : e.getDefaultMessage(),
-                        (a, b) -> a));
+                        (a, _) -> a));
 
         return ResponseEntity.badRequest()
                 .body(Map.of("message", "Revise los campos del formulario", "errors", errors));
