@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
-    "lint": "oxlint",
+    "lint": "oxlint src",
     "preview": "vite preview"
   },
   "dependencies": {

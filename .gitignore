@@ -5,8 +5,18 @@ sources/
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+# Node
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
 
 ### STS ###
 .apt_generated
