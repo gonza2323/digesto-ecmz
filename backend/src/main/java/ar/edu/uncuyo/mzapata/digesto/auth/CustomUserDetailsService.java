@@ -1,6 +1,6 @@
 package ar.edu.uncuyo.mzapata.digesto.auth;
 
-import ar.edu.uncuyo.mzapata.digesto.user.Users;
+import ar.edu.uncuyo.mzapata.digesto.user.Usuario;
 import ar.edu.uncuyo.mzapata.digesto.user.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

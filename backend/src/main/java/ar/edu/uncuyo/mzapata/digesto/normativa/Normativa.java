@@ -1,14 +1,3 @@
-/*+ id: UUID
-+ nro: int
-+ titulo: String
-+ descripcion: String
-+ fechaEmision: LocalDate
-+ fechaCarga: LocalDate
-+ visible: Bool
-+ texto: String
-+ vector: pg_vector (tal vez para búsquedas)
-+ aceptado: Bool*/
-
 package ar.edu.uncuyo.mzapata.digesto.normativa;
 
 import ar.edu.uncuyo.mzapata.digesto.archivo.Archivo;
