@@ -1,159 +1,92 @@
 package ar.edu.uncuyo.mzapata.digesto.user;
 
-import ar.edu.uncuyo.mzapata.digesto.bussinesException.BusinessException;
-import jakarta.transaction.Transactional;
+import ar.edu.uncuyo.mzapata.digesto.config.BusinessException;
+import ar.edu.uncuyo.mzapata.digesto.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
-
 
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    private final UsuarioRepository repository;
+    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final SecureRandom random = new SecureRandom();
 
+    @Transactional(readOnly = true)
+    public List<UsuarioDto> list() {
+        return usuarioRepository.findAllByDeletedFalseOrderByLastnameAsc().stream().map(UsuarioDto::of).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario find(UUID id) {
+        return usuarioRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> BusinessException.notFound("El usuario no existe"));
+    }
+
+    /**
+     * Crea el usuario con una contraseña generada que se envía por correo.
+     */
     @Transactional
-    //TODO: Decidir la creacion por defecto de la contraseña, y aplicar job para mandar contraseña por email
-    public Usuario crearUsuario(UsuarioDetailDto dto) {
+    public UsuarioDto create(UsuarioFormDto dto) {
+        String email = dto.email().trim().toLowerCase();
+        if (usuarioRepository.existsByEmailAndDeletedFalse(email))
+            throw new BusinessException("Ya existe un usuario con ese email");
 
-        if (!validarCreate(dto)) {
-            throw new RuntimeException("No se pudo crear el usuario");
-        }
+        String password = generatePassword();
 
-
-
-        Usuario usuario = Usuario.builder()
-                .firstname(dto.getFirstname())
-                .lastname(dto.getLastname())
-                .email(dto.getEmail())
-                .passwordHash(dto.getFirstname().toLowerCase() + dto.getLastname().toLowerCase())
+        Usuario usuario = usuarioRepository.save(Usuario.builder()
+                .firstname(dto.firstname().trim())
+                .lastname(dto.lastname().trim())
+                .email(email)
+                .passwordHash(passwordEncoder.encode(password))
                 .mustChangePassword(true)
-                .role(dto.getRole())
-                .build();
+                .role(dto.role())
+                .build());
 
-        repository.save(usuario);
-        return usuario;
+        mailService.send(email,
+                "Digesto - Acceso al sistema",
+                "Se creó su cuenta en el Digesto.\n\nEmail: " + email
+                        + "\nContraseña provisoria: " + password
+                        + "\n\nDeberá cambiarla la primera vez que ingrese.");
+
+        return UsuarioDto.of(usuario);
     }
 
     @Transactional
-    public void eliminarUsuario(UsuarioSummaryDto dto){
-        Usuario usuarioActual = repository.findByEmailAndDeletedFalse(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("No se pudo encontrar al usuario"));
+    public UsuarioDto update(UUID id, UsuarioFormDto dto) {
+        Usuario usuario = find(id);
+        String email = dto.email().trim().toLowerCase();
+        if (usuarioRepository.existsByEmailAndIdNotAndDeletedFalse(email, id))
+            throw new BusinessException("Ya existe un usuario con ese email");
 
-        usuarioActual.setDeleted(true);
+        usuario.setFirstname(dto.firstname().trim());
+        usuario.setLastname(dto.lastname().trim());
+        usuario.setEmail(email);
+        usuario.setRole(dto.role());
+
+        return UsuarioDto.of(usuario);
     }
 
     @Transactional
-    public UsuarioDetailDto buscarUsuario(String email) {
-        return repository.findByEmailAndDeletedFalse(email)
-                .map(this::toDetailDto)
-                .orElseThrow(() -> new BusinessException("No se pudo encontrar al usuario"));
+    public void delete(UUID id, UUID currentUserId) {
+        if (id.equals(currentUserId))
+            throw new BusinessException("No puede eliminar su propio usuario");
+
+        find(id).setDeleted(true);
     }
 
-    //funcion para traer los datos completos del usuario actual
-    @Transactional
-    public UsuarioDetailDto getUsuario(String id) {
-        return repository.findByIdAndDeletedFalse(UUID.fromString(id))
-                .map(this::toDetailDto)
-                .orElseThrow(() -> new BusinessException("No se pudo encontrar al usuario"));
+    private String generatePassword() {
+        byte[] bytes = new byte[9];
+        random.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
-
-    @Transactional
-    //TODO: Mejorar mensaje de error, hacer un update dedicado para la contraseña
-    public UsuarioDetailDto actualizarUsuario(String id, UsuarioRequestDto newData){
-        Optional<Usuario> usuarioActual = repository.findByIdAndDeletedFalse(UUID.fromString(id));
-
-        if (!usuarioActual.isPresent()) {
-            throw new RuntimeException("Ha ocurrido un error");
-        }
-
-        if (usuarioActual.get().isMustChangePassword()){
-            throw new RuntimeException("Debe cambiar la primera contraseña"); //poner error mas claro
-        }
-
-        if (!validarUpdate(newData, UUID.fromString(id))){
-            throw new RuntimeException("Uno o mas campos invalidos");
-        }
-
-        usuarioActual.get().setFirstname(newData.getFirstname());
-        usuarioActual.get().setLastname(newData.getLastname());
-        usuarioActual.get().setEmail(newData.getEmail());
-
-        repository.save(usuarioActual.get());
-        return toDetailDto(usuarioActual.get());
-    }
-
-    @Transactional
-    //TODO: En iteracion futura agregar la encriptacion de claves
-    public UsuarioDetailDto firstLogIn(String id, String newPassword) { //funcion para primer ingreso
-        Optional<Usuario> usuario = repository.findByIdAndDeletedFalse(UUID.fromString(id));
-        if (usuario.isPresent()){
-
-            //valido que no este vacia ni sean solo espacios en blanco
-            if (newPassword.isBlank() || newPassword.isEmpty()){
-                throw new BusinessException("La contraseña no puede estar vacia");
-            }
-
-            String oldPassword = usuario.get().getPasswordHash(); //recordar que sera un hash
-
-            //valido que no deje igual la contrasenia
-            if (Objects.equals(oldPassword, newPassword)){
-                throw new BusinessException("La contraseña debe ser distinta");
-            }
-
-            usuario.get().setPasswordHash(newPassword);
-            usuario.get().setMustChangePassword(false);
-            repository.save(usuario.get());
-
-            return toDetailDto(usuario.get());
-        } else {
-            throw new RuntimeException("No existe el usuario");
-        }
-    }
-
-    // ====================== Funciones De Utilidad ======================
-
-    //Valido Campos
-    //TODO: Mejorar la validacion del email y revisar
-    private boolean validarCreate(UsuarioDetailDto dto) {
-        if (dto.getFirstname() == null || dto.getFirstname().isBlank()
-                || dto.getLastname() == null || dto.getLastname().isBlank()
-                || dto.getEmail() == null || dto.getEmail().isBlank()) {
-            return false;
-        }
-        return !repository.existsByEmailAndDeletedFalse(dto.getEmail());
-    }
-
-    //Mapper para datos del usuario
-    private UsuarioDetailDto toDetailDto(Usuario usuario) {
-        return UsuarioDetailDto.builder()
-                .id(usuario.getId())
-                .firstname(usuario.getFirstname())
-                .lastname(usuario.getLastname())
-                .email(usuario.getEmail())
-                .role(usuario.getRole())
-                .build();
-    }
-    //validacion de campos para el update, creo que conviene dejar por separado el update de la contraseña
-    private boolean validarUpdate(UsuarioRequestDto dto, UUID id){
-        if (dto.getFirstname() == null || dto.getFirstname().isBlank()
-                || dto.getLastname() == null || dto.getLastname().isBlank()
-                || dto.getEmail() == null || dto.getEmail().isBlank()) {
-            return false;
-        }
-        return !repository.existsByEmailAndIdNotAndDeletedFalse(dto.getEmail(), id);
-    }
-
-    //    //funcion para emparejar los datos ingresados por el usuario en funciones de utilidad
-    //    private UsuarioDetailDto formatData(UsuarioDetailDto dto){
-    //
-    //    }
-
-
 }

@@ -1,8 +1,3 @@
-/*+ id: UUID
-+ path: String
-+ nombre: String
-+ tamaño: Int
-+ mime: String*/
 package ar.edu.uncuyo.mzapata.digesto.archivo;
 
 import ar.edu.uncuyo.mzapata.digesto.entity.BaseEntity;
@@ -22,11 +17,21 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Archivo extends BaseEntity {
 
+    /**
+     * Nombre del archivo dentro de la carpeta de almacenamiento.
+     */
     @Column(nullable = false)
     private String path;
+
+    /**
+     * Nombre original con el que se subió.
+     */
     @Column(nullable = false)
     private String name;
-    private Integer size;
-    private String mime;
 
+    @Column(nullable = false)
+    private long size;
+
+    @Column(nullable = false)
+    private String mime;
 }

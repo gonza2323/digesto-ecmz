@@ -1,82 +1,80 @@
 package ar.edu.uncuyo.mzapata.digesto.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.List;
-
+/**
+ * Autenticación basada en sesión HTTP (cookie de sesión): el login deja la identidad
+ * guardada en la sesión y las siguientes requests llegan autenticadas gracias a esa
+ * cookie. No se emite ni se valida ningún tipo de token.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-@EnableMethodSecurity(prePostEnabled = true)
 public class AuthController {
 
-    private final AccessTokenService accessTokenService;
     private final AuthService authService;
-//    private final ClienteFacade clienteFacade;
-//    private final PersonaService personaService;
+    private final PasswordService passwordService;
+
+    // Desde Spring Security 6 el SecurityContext hay que guardarlo explícitamente
+    // para que persista entre requests (ya no se hace automáticamente al final del request).
+    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     @PostMapping("/login")
-    @PreAuthorize("isAnonymous()")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto loginRequest) {
-        CustomUserDetails user = authService.loginWithEmailPassword(loginRequest);
-        AccessTokenDto accessToken = accessTokenService.createToken(user.getId(), user.getRoles());
+    public AuthUserDto login(@Valid @RequestBody LoginRequestDto loginRequest,
+                             HttpServletRequest request, HttpServletResponse response) {
+        Authentication authentication = authService.loginWithEmailPassword(loginRequest);
 
-        LoginResponseDto response = LoginResponseDto.builder()
-                .token(accessToken)
-                .user(new AuthUserDto(user.getId(), user.getRoles()))
-                .build();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        securityContextRepository.saveContext(context, request, response);
 
-        return ResponseEntity.ok()
-                .body(response);
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        return new AuthUserDto(user.getId(), user.getRoles(), user.isMustChangePassword());
     }
 
-//    @PostMapping("/signup")
-//    @PreAuthorize("isAnonymous()")
-//    public ResponseEntity<LoginResponseDto> signup(
-//            @RequestPart ClienteCreateRequestDto clienteDto,
-//            @RequestPart(required = false) MultipartFile imageFile) {
-//
-//        ImageData imageData = null;
-//        if (imageFile != null && !imageFile.isEmpty()) {
-//            try {
-//                byte[] content = imageFile.getBytes();
-//                String fileName = imageFile.getOriginalFilename();
-//                String mimeType = imageFile.getContentType();
-//                imageData = new ImageData(fileName, mimeType, content);
-//            } catch (IOException e) {
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//            }
-//        }
-//
-//        Cliente cliente = clienteFacade.registarCliente(clienteDto, imageData);
-//
-//        Usuario user = cliente.getUsuario();
-//        AccessTokenDto accessToken = accessTokenService.createToken(user.getId(), List.of(user.getRol()));
-//
-//        LoginResponseDto response = LoginResponseDto.builder()
-//                .token(accessToken)
-//                .user(new AuthUserDto(user.getId(), List.of(user.getRol())))
-//                .build();
-//
-//        return ResponseEntity.ok()
-//                .body(response);
-//    }
+    @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
+    public void logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
+    }
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<AuthUserDto> authStatus(@AuthenticationPrincipal CurrentUser user) {
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public AuthUserDto me(@AuthenticationPrincipal CustomUserDetails user) {
+        return authService.me(user.getId());
+    }
 
-        return ResponseEntity.ok(new AuthUserDto(user.getId(), user.getRoles()));
+    @PostMapping("/change-password")
+    @PreAuthorize("isAuthenticated()")
+    public void changePassword(@AuthenticationPrincipal CustomUserDetails user,
+                               @Valid @RequestBody ChangePasswordDto dto) {
+        passwordService.change(user.getId(), dto);
+    }
+
+    @PostMapping("/forgot-password")
+    public void forgotPassword(@Valid @RequestBody ForgotPasswordDto dto) {
+        passwordService.forgot(dto);
+    }
+
+    @PostMapping("/reset-password")
+    public void resetPassword(@Valid @RequestBody ResetPasswordDto dto) {
+        passwordService.reset(dto);
     }
 }

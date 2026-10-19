@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 public class DigestoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DigestoApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DigestoApplication.class, args);
+    }
 
 }
