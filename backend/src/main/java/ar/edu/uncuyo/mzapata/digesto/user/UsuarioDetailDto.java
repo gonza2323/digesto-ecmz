@@ -18,5 +18,5 @@ public class UsuarioDetailDto {
     private String firstname;
     private String lastname;
     private String email;
-    private UserRole role;
+    private UserRole rol;
 }

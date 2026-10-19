@@ -1,6 +1,6 @@
 package ar.edu.uncuyo.mzapata.digesto.auth;
 
-import ar.edu.uncuyo.mzapata.digesto.user.Usuario;
+import ar.edu.uncuyo.mzapata.digesto.user.Users;
 import ar.edu.uncuyo.mzapata.digesto.user.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,12 +21,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmailAndDeletedFalse(username);
+        Optional<Users> usuarioOpt = usuarioRepository.findByEmailAndDeletedFalse(username);
 
         if (usuarioOpt.isEmpty())
             throw new UsernameNotFoundException("Usuario no encontrado");
 
-        Usuario usuario = usuarioOpt.get();
-        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPasswordHash(), List.of(usuario.getRole()));
+        Users usuario = usuarioOpt.get();
+        return new CustomUserDetails(usuario.getId(), usuario.getEmail(), usuario.getPasswordHash(), List.of(usuario.getRol()));
     }
 }

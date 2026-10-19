@@ -17,13 +17,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario extends BaseEntity {
+public class Users extends BaseEntity {
 
     @Column(nullable = false)
-    private String firstname;
+    private String nombre;
 
     @Column(nullable = false)
-    private String lastname;
+    private String apellido;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -35,5 +35,5 @@ public class Usuario extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole rol;
 }
