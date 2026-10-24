@@ -6,7 +6,7 @@ import {AdminSidebar} from '@/components/AdminSidebar'
 import {useAuth} from '@/hooks/useAuth'
 
 export function AdminLayout() {
-    const {user, hasRole, logout} = useAuth()
+    const {hasRole, logout} = useAuth()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [backupAlert, setBackupAlert] = useState<{ meses: number } | null>(null)
 
@@ -74,10 +74,6 @@ export function AdminLayout() {
                 </div>
                 <div className="flex-1 overflow-y-auto">
                     <AdminSidebar/>
-                </div>
-                <div className="px-4 py-3 border-t border-neutral-200 text-xs text-neutral-500">
-                    <p className="truncate">{user?.userId}</p>
-                    <p>{hasRole('SUPERADMIN') ? 'Super administrador' : 'Administrador'}</p>
                 </div>
             </aside>
 

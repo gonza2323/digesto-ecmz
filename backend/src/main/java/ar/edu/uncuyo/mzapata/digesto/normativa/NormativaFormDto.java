@@ -39,9 +39,6 @@ public record NormativaFormDto(
         @NotBlank(message = "Ingrese el título del expediente")
         String recordTitle,
 
-        List<@Email(message = "Hay una dirección de correo inválida") String> notificaciones,
-
-        /** false guarda como borrador; true la envía a aprobación. */
-        boolean enviarAAprobacion
+        List<@Email(message = "Hay una dirección de correo inválida") String> notificaciones
 ) {
 }

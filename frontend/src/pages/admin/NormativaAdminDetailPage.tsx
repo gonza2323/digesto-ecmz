@@ -52,10 +52,9 @@ export function NormativaAdminDetailPage() {
                 <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{data.title}</h1>
                 <p className="text-neutral-700 whitespace-pre-line mb-6">{data.description}</p>
 
-                {data.estado === 'BORRADOR' && (
+                {data.estado === 'NO PUBLICADA' && (
                     <Alert variant="info" className="mb-6">
-                        Es un borrador: no es visible para el público ni está esperando aprobación. Edítela y envíela
-                        a aprobación para publicarla.
+                        Esta normativa no está publicada ni esperando aprobación.
                     </Alert>
                 )}
                 {isPending && (

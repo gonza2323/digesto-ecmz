@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Panel de administración: incluye borradores y pendientes de aprobación.
+ * Panel de administración: incluye normativas no publicadas y pendientes de aprobación.
  */
 @RestController
 @RequiredArgsConstructor

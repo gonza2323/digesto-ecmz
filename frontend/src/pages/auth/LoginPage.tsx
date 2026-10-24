@@ -43,6 +43,12 @@ export function LoginPage() {
 
     return (
         <AuthCard title="Iniciar sesión" subtitle="Acceso para personal administrativo del digesto.">
+            <Link
+                to="/"
+                className="inline-flex items-center text-sm text-institutional hover:underline mb-4"
+            >
+                Volver al sitio público
+            </Link>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
                 {submitError && <Alert variant="error">{submitError}</Alert>}
 

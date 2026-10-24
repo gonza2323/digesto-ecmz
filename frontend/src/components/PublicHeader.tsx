@@ -1,4 +1,4 @@
-import {FileText, LayoutDashboard, LogIn, LogOut} from 'lucide-react'
+import {LayoutDashboard, LogIn, LogOut} from 'lucide-react'
 import {NavLink} from 'react-router-dom'
 import {useAuth} from '@/hooks/useAuth'
 
@@ -42,20 +42,6 @@ export function PublicHeader() {
                         </NavLink>
                     )}
                 </div>
-                <nav className="flex gap-1 sm:gap-2" aria-label="Navegación principal">
-                    <NavLink
-                        to="/"
-                        end
-                        className={({isActive}) =>
-                            `flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base rounded-lg transition-colors ${
-                                isActive ? 'bg-white text-institutional' : 'text-white hover:bg-institutional-dark'
-                            }`
-                        }
-                    >
-                        <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true"/>
-                        Documentos
-                    </NavLink>
-                </nav>
             </div>
         </header>
     )

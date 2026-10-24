@@ -67,7 +67,7 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                     <p className="text-xs sm:text-sm text-neutral-600 mt-1">
                         {pendientesOnly
                             ? 'Revise el PDF y decida si aprobar o rechazar cada carga o modificación.'
-                            : 'Incluye borradores y normativas pendientes de aprobación.'}
+                            : 'Incluye normativas no publicadas y pendientes de aprobación.'}
                     </p>
                 </div>
                 {!pendientesOnly && (

@@ -1,4 +1,4 @@
-export type EstadoNormativa = 'BORRADOR' | 'PENDIENTE' | 'PUBLICADA'
+export type EstadoNormativa = 'NO PUBLICADA' | 'PENDIENTE' | 'PUBLICADA'
 
 /** NormativaSummaryDto — what search/list endpoints return. */
 export interface NormativaSummary {
@@ -47,7 +47,6 @@ export interface NormativaFormValues {
     recordNumber: number
     recordTitle: string
     notificaciones: string[]
-    enviarAAprobacion: boolean
 }
 
 /** NormativaFilterDto — query params accepted by both search endpoints. */

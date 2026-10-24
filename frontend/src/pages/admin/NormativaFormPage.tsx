@@ -1,4 +1,4 @@
-import {Plus, Save, Send, X} from 'lucide-react'
+import {Plus, Send, X} from 'lucide-react'
 import {useEffect, useRef, useState} from 'react'
 import {useForm} from 'react-hook-form'
 import {useNavigate, useParams} from 'react-router-dom'
@@ -19,7 +19,7 @@ import type {NormativaFormValues} from '@/types/normativa'
 import {getErrorMessage, getFieldErrors} from '@/utils/errors'
 
 /** Form state: everything in NormativaFormDto except the fields managed outside RHF. */
-type FormValues = Omit<NormativaFormValues, 'notificaciones' | 'enviarAAprobacion'>
+type FormValues = Omit<NormativaFormValues, 'notificaciones'>
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/
 
@@ -53,7 +53,6 @@ export function NormativaFormPage() {
     const [emailError, setEmailError] = useState<string | undefined>()
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [expedienteEnUso, setExpedienteEnUso] = useState(false)
-    const submitMode = useRef<'borrador' | 'aprobacion'>('borrador')
     const originalRecordNumber = useRef<number | null>(null)
 
     const catalogs = useAsyncData(
@@ -157,7 +156,6 @@ export function NormativaFormPage() {
             description: values.description.trim(),
             recordTitle: values.recordTitle.trim(),
             notificaciones: emails,
-            enviarAAprobacion: submitMode.current === 'aprobacion',
         }
 
         try {
@@ -165,12 +163,7 @@ export function NormativaFormPage() {
                 isEdit && id
                     ? await normativasApi.update(id, payload, archivo)
                     : await normativasApi.create(payload, archivo as File)
-            showToast(
-                'success',
-                payload.enviarAAprobacion
-                    ? 'La normativa fue enviada a aprobación.'
-                    : 'La normativa se guardó como borrador.',
-            )
+            showToast('success', 'La normativa fue enviada a aprobación.')
             navigate(`/admin/normativas/${saved.id}`, {replace: true})
         } catch (error) {
             const fieldErrors = getFieldErrors(error)
@@ -194,7 +187,7 @@ export function NormativaFormPage() {
                 {isEdit ? 'Editar normativa' : 'Nueva normativa'}
             </h1>
             <p className="text-xs sm:text-sm text-neutral-600 mt-1 mb-5">
-                Complete los campos. Puede guardar como borrador o enviarla a aprobación.
+                Complete los campos para enviarla a aprobación.
             </p>
 
             {publishedWarning && (
@@ -405,17 +398,7 @@ export function NormativaFormPage() {
                     </Button>
                     <Button
                         type="submit"
-                        variant="secondary"
-                        disabled={isSubmitting}
-                        onClick={() => (submitMode.current = 'borrador')}
-                    >
-                        <Save className="w-4 h-4" aria-hidden="true"/>
-                        Guardar borrador
-                    </Button>
-                    <Button
-                        type="submit"
                         loading={isSubmitting}
-                        onClick={() => (submitMode.current = 'aprobacion')}
                     >
                         <Send className="w-4 h-4" aria-hidden="true"/>
                         Continuar

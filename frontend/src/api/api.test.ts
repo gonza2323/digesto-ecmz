@@ -62,7 +62,6 @@ const values: NormativaFormValues = {
     recordNumber: 10,
     recordTitle: 'Expediente',
     notificaciones: ['a@b.com'],
-    enviarAAprobacion: true,
 }
 
 /** Captures the request body instead of hitting the network. */

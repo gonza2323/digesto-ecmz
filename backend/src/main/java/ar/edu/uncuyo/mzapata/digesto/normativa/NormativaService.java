@@ -52,7 +52,7 @@ public class NormativaService {
     }
 
     /**
-     * Búsqueda de administración: incluye borradores y pendientes.
+     * Búsqueda de administración: incluye normativas no publicadas y pendientes.
      */
     @Transactional(readOnly = true)
     public Page<NormativaSummaryDto> searchAdmin(NormativaFilterDto filtro, boolean soloPendientes, Pageable pageable) {
@@ -127,7 +127,7 @@ public class NormativaService {
                 .loadDate(LocalDate.now())
                 .visible(false)
                 .accepted(false)
-                .pendingApproval(dto.enviarAAprobacion())
+                .pendingApproval(true)
                 .autoridad(autoridadService.find(dto.autoridadId()))
                 .tipoDocumento(tipoDocumentoService.find(dto.tipoDocumentoId()))
                 .expediente(resolveExpediente(dto))
@@ -167,7 +167,7 @@ public class NormativaService {
         // La modificación queda oculta hasta que un superadmin la apruebe.
         normativa.setVisible(false);
         normativa.setAccepted(false);
-        normativa.setPendingApproval(dto.enviarAAprobacion());
+        normativa.setPendingApproval(true);
 
         return NormativaDetailDto.ofAdmin(normativa);
     }
@@ -201,7 +201,8 @@ public class NormativaService {
 
     /**
      * Rechaza la carga o la modificación. Si había una versión publicada previa se restaura;
-     * si era una normativa nueva, vuelve a estado borrador.
+     * si era una normativa nueva, se da de baja porque no existe una versión
+     * publicable para conservar.
      */
     @Transactional
     public NormativaDetailDto reject(UUID id, String motivo) {
@@ -216,6 +217,9 @@ public class NormativaService {
             normativa.setPreviousVersion(null);
             normativa.setAccepted(true);
             normativa.setVisible(true);
+        } else {
+            normativa.setDeleted(true);
+            normativa.setVisible(false);
         }
 
         avisarRechazo(normativa, motivo);

@@ -105,7 +105,7 @@ export function useNormativaActions(onDone: (kind: Pending['kind']) => void) {
                     description={
                         <>
                             Se rechazará <strong>{pending.title}</strong>. Si era una modificación de una normativa ya
-                            publicada, se restaurará la versión anterior; si era nueva, volverá a borrador. Se avisará
+                            publicada, se restaurará la versión anterior; si era nueva, se retirará del sistema. Se avisará
                             por correo a quien la cargó.
                         </>
                     }

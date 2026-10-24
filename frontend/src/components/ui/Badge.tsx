@@ -18,13 +18,13 @@ export function Badge({children, className}: { children: ReactNode; className?: 
 const estadoStyles: Record<EstadoNormativa, string> = {
     PUBLICADA: 'bg-green-100 text-green-800',
     PENDIENTE: 'bg-amber-100 text-amber-800',
-    BORRADOR: 'bg-neutral-100 text-neutral-700',
+    'NO PUBLICADA': 'bg-neutral-100 text-neutral-700',
 }
 
 const estadoLabels: Record<EstadoNormativa, string> = {
     PUBLICADA: 'Publicada',
     PENDIENTE: 'Pendiente',
-    BORRADOR: 'Borrador',
+    'NO PUBLICADA': 'No publicada',
 }
 
 export function EstadoBadge({estado}: { estado: EstadoNormativa }) {
