@@ -102,7 +102,7 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                     value={draftTipo}
                     onChange={(event) => setDraftTipo(event.target.value)}
                 >
-                    <option value="">Todos los tipos</option>
+                    <option value="">TODOS</option>
                     {tipos.map((tipo) => (
                         <option key={tipo.id} value={tipo.id}>
                             {tipo.name}
@@ -115,7 +115,7 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                     value={draftAutoridad}
                     onChange={(event) => setDraftAutoridad(event.target.value)}
                 >
-                    <option value="">Todas las autoridades</option>
+                    <option value="">TODAS</option>
                     {autoridades.map((autoridad) => (
                         <option key={autoridad.id} value={autoridad.id}>
                             {autoridad.name}

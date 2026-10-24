@@ -224,7 +224,7 @@ export function NormativaFormPage() {
                     required={!isEdit}
                 />
 
-                <FormField label="Título" htmlFor="title" required error={errors.title?.message}>
+                <FormField label="Título de la normativa" htmlFor="title" required error={errors.title?.message}>
                     <Input
                         id="title"
                         hasError={!!errors.title}
@@ -262,7 +262,7 @@ export function NormativaFormPage() {
                         </Select>
                     </FormField>
 
-                    <FormField label="Autoridad" htmlFor="autoridadId" required error={errors.autoridadId?.message}>
+                    <FormField label="Autoridad emisora" htmlFor="autoridadId" required error={errors.autoridadId?.message}>
                         <Select
                             id="autoridadId"
                             hasError={!!errors.autoridadId}
@@ -308,7 +308,7 @@ export function NormativaFormPage() {
                     </FormField>
 
                     <FormField
-                        label="Número de expediente"
+                        label="Número de expediente asociado"
                         htmlFor="recordNumber"
                         required
                         error={errors.recordNumber?.message}
@@ -418,7 +418,7 @@ export function NormativaFormPage() {
                         onClick={() => (submitMode.current = 'aprobacion')}
                     >
                         <Send className="w-4 h-4" aria-hidden="true"/>
-                        Enviar a aprobación
+                        Continuar
                     </Button>
                 </div>
             </form>
