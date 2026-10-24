@@ -19,7 +19,7 @@ export function PublicHeader() {
                                 className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-white text-institutional rounded-lg hover:bg-neutral-100 transition-colors"
                             >
                                 <LayoutDashboard className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true"/>
-                                <span className="hidden sm:inline">Panel administrativo</span>
+                                <span className="hidden sm:inline">                                Ver sitio administrativo</span>
                                 <span className="sm:hidden">Panel</span>
                             </NavLink>
                             <button

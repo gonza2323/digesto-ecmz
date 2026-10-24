@@ -42,7 +42,7 @@ public class AuthController {
         securityContextRepository.saveContext(context, request, response);
 
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        return new AuthUserDto(user.getId(), user.getRoles(), user.isMustChangePassword());
+        return authService.me(user.getId());
     }
 
     @PostMapping("/logout")

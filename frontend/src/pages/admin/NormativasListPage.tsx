@@ -146,7 +146,7 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                         detailPath={(id) => `/admin/normativas/${id}`}
                         renderActions={(item) => (
                             <>
-                                <IconLink to={`/admin/normativas/${item.id}`} label={`Ver ${item.title}`}>
+                                <IconLink to={`/admin/normativas/${item.id}`} label={`Ver ${item.title}`} title="Ver normativa">
                                     <Eye className="w-4 h-4" aria-hidden="true"/>
                                 </IconLink>
                                 <a
@@ -154,11 +154,12 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={`Abrir PDF de ${item.title}`}
+                                    title="Ver PDF"
                                     className="p-2 text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
                                 >
                                     <ExternalLink className="w-4 h-4" aria-hidden="true"/>
                                 </a>
-                                <IconLink to={`/admin/normativas/${item.id}/editar`} label={`Editar ${item.title}`}>
+                                <IconLink to={`/admin/normativas/${item.id}/editar`} label={`Editar ${item.title}`} title="Editar normativa">
                                     <Pencil className="w-4 h-4" aria-hidden="true"/>
                                 </IconLink>
                                 {isSuper && item.estado === 'PENDIENTE' && (
@@ -181,6 +182,7 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                                     type="button"
                                     onClick={() => actions.askDelete(item.id, item.title)}
                                     aria-label={`Eliminar ${item.title}`}
+                                    title="Eliminar normativa"
                                     className="p-2 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
                                 >
                                     <Trash2 className="w-4 h-4" aria-hidden="true"/>
@@ -197,11 +199,12 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
     )
 }
 
-function IconLink({to, label, children}: { to: string; label: string; children: React.ReactNode }) {
+function IconLink({to, label, title, children}: { to: string; label: string; title: string; children: React.ReactNode }) {
     return (
         <Link
             to={to}
             aria-label={label}
+            title={title}
             className="p-2 text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
         >
             {children}

@@ -65,6 +65,10 @@ export function CatalogPage({title, description, noun, plural, article, api}: Ca
             setFormError('Ingrese el nombre')
             return
         }
+        if (trimmed.length > 255) {
+            setFormError('El nombre no puede superar los 255 caracteres')
+            return
+        }
         setSaving(true)
         setFormError(null)
         try {

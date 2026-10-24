@@ -38,6 +38,11 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> BusinessException.notFound("El usuario no existe"));
 
-        return new AuthUserDto(usuario.getId(), List.of(usuario.getRole()), usuario.isMustChangePassword());
+        return new AuthUserDto(
+                usuario.getId(),
+                (usuario.getFirstname() + " " + usuario.getLastname()).trim(),
+                List.of(usuario.getRole()),
+                usuario.isMustChangePassword()
+        );
     }
 }

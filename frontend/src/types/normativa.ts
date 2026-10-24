@@ -49,6 +49,11 @@ export interface NormativaFormValues {
     notificaciones: string[]
 }
 
+export interface Expediente {
+    recordNumber: number
+    recordTitle: string
+}
+
 /** NormativaFilterDto — query params accepted by both search endpoints. */
 export interface NormativaFilters {
     q?: string

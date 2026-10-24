@@ -212,6 +212,7 @@ export function HomePage() {
                                 id="f-number"
                                 type="number"
                                 min={1}
+                                max={999999999}
                                 placeholder="Ej: 145"
                                 value={draft.number ?? ''}
                                 onChange={(event) => setDraftField('number', event.target.value)}
@@ -222,6 +223,7 @@ export function HomePage() {
                                 id="f-record"
                                 type="number"
                                 min={1}
+                                max={999999999}
                                 value={draft.recordNumber ?? ''}
                                 onChange={(event) => setDraftField('recordNumber', event.target.value)}
                             />

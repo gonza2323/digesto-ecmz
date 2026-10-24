@@ -31,6 +31,7 @@ export function NormativaAdminDetailPage() {
     if (!data) return null
 
     const isPending = data.estado === 'PENDIENTE'
+    const isPublished = data.estado === 'PUBLICADA'
 
     return (
         <div className="max-w-4xl">
@@ -49,7 +50,7 @@ export function NormativaAdminDetailPage() {
                     <span className="text-sm text-neutral-500">N° {data.number}</span>
                 </div>
 
-                <h1 className="text-2xl font-semibold text-neutral-900 mb-3">{data.title}</h1>
+                <h1 className="break-words text-2xl font-semibold text-neutral-900 mb-3">{data.title}</h1>
                 <p className="text-neutral-700 whitespace-pre-line mb-6">{data.description}</p>
 
                 {data.estado === 'NO PUBLICADA' && (
@@ -71,7 +72,7 @@ export function NormativaAdminDetailPage() {
                     <Item label="Archivo" value={`${data.archivoName} (${formatFileSize(data.archivoSize)})`}/>
                     <div className="sm:col-span-2">
                         <dt className="text-neutral-500">Correos a notificar al aprobar</dt>
-                        <dd className="text-neutral-900 font-medium mt-0.5">
+                        <dd className="break-words text-neutral-900 font-medium mt-0.5">
                             {data.notificaciones && data.notificaciones.length > 0
                                 ? data.notificaciones.join(', ')
                                 : 'Ninguno'}
@@ -93,17 +94,23 @@ export function NormativaAdminDetailPage() {
                         <Pencil className="w-4 h-4" aria-hidden="true"/>
                         Editar
                     </Button>
-                    {hasRole('SUPERADMIN') && isPending && (
+                    {!isPublished && hasRole('SUPERADMIN') && (
                         <>
                             <Button onClick={() => actions.askApprove(data.id, data.title)}>
                                 <Check className="w-4 h-4" aria-hidden="true"/>
-                                Aprobar
+                                Publicar
                             </Button>
-                            <Button variant="secondary" onClick={() => actions.askReject(data.id, data.title)}>
+                            {isPending && <Button variant="secondary" onClick={() => actions.askReject(data.id, data.title)}>
                                 <X className="w-4 h-4" aria-hidden="true"/>
                                 Rechazar
-                            </Button>
+                            </Button>}
                         </>
+                    )}
+                    {!isPublished && !hasRole('SUPERADMIN') && !isPending && (
+                        <Button onClick={() => actions.askSubmit(data.id, data.title)}>
+                            <Check className="w-4 h-4" aria-hidden="true"/>
+                            Enviar a aprobación
+                        </Button>
                     )}
                     <Button variant="danger" onClick={() => actions.askDelete(data.id, data.title)}>
                         <Trash2 className="w-4 h-4" aria-hidden="true"/>

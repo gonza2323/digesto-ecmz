@@ -78,12 +78,14 @@ export function ResetPasswordPage() {
                     <Input
                         id="newPassword"
                         type="password"
+                        maxLength={128}
                         autoComplete="new-password"
                         hasError={!!errors.newPassword}
                         aria-invalid={!!errors.newPassword}
                         {...register('newPassword', {
                             required: 'Ingrese la nueva contraseña',
                             minLength: {value: 8, message: 'La contraseña debe tener al menos 8 caracteres'},
+                            maxLength: {value: 128, message: 'La contraseña no puede superar los 128 caracteres'},
                         })}
                     />
                 </FormField>

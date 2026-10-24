@@ -7,6 +7,7 @@ import ar.edu.uncuyo.mzapata.digesto.autoridad.AutoridadService;
 import ar.edu.uncuyo.mzapata.digesto.config.AppProperties;
 import ar.edu.uncuyo.mzapata.digesto.config.BusinessException;
 import ar.edu.uncuyo.mzapata.digesto.expediente.Expediente;
+import ar.edu.uncuyo.mzapata.digesto.expediente.ExpedienteDto;
 import ar.edu.uncuyo.mzapata.digesto.expediente.ExpedienteRepository;
 import ar.edu.uncuyo.mzapata.digesto.mail.MailService;
 import ar.edu.uncuyo.mzapata.digesto.setting.AppSettingService;
@@ -110,6 +111,13 @@ public class NormativaService {
         return normativaRepository.existsByExpedienteRecordNumberAndDeletedFalse(recordNumber);
     }
 
+    @Transactional(readOnly = true)
+    public ExpedienteDto findExpediente(Integer recordNumber) {
+        return expedienteRepository.findByRecordNumber(recordNumber)
+                .map(ExpedienteDto::of)
+                .orElse(null);
+    }
+
     // ---------- Alta, modificación y baja ----------
 
     @Transactional
@@ -127,7 +135,7 @@ public class NormativaService {
                 .loadDate(LocalDate.now())
                 .visible(false)
                 .accepted(false)
-                .pendingApproval(true)
+                .pendingApproval(false)
                 .autoridad(autoridadService.find(dto.autoridadId()))
                 .tipoDocumento(tipoDocumentoService.find(dto.tipoDocumentoId()))
                 .expediente(resolveExpediente(dto))
@@ -138,6 +146,15 @@ public class NormativaService {
         normativa.replaceNotificaciones(dto.notificaciones());
 
         return NormativaDetailDto.ofAdmin(normativaRepository.save(normativa));
+    }
+
+    @Transactional
+    public NormativaDetailDto submitForApproval(UUID id) {
+        Normativa normativa = require(id);
+        if (normativa.isAccepted() && normativa.isVisible())
+            throw new BusinessException("La normativa ya está publicada");
+        normativa.setPendingApproval(true);
+        return NormativaDetailDto.ofAdmin(normativa);
     }
 
     @Transactional
@@ -164,10 +181,10 @@ public class NormativaService {
             normativa.setText(archivoService.extractText(archivo));
         }
 
-        // La modificación queda oculta hasta que un superadmin la apruebe.
+        // La modificación queda en previsualización hasta que se envíe a aprobación.
         normativa.setVisible(false);
         normativa.setAccepted(false);
-        normativa.setPendingApproval(true);
+        normativa.setPendingApproval(false);
 
         return NormativaDetailDto.ofAdmin(normativa);
     }
@@ -189,7 +206,8 @@ public class NormativaService {
     public AprobacionResultDto approve(UUID id) {
         Normativa normativa = require(id);
         if (!normativa.isPendingApproval())
-            throw new BusinessException("La normativa no está esperando aprobación");
+            if (normativa.isAccepted() && normativa.isVisible())
+                throw new BusinessException("La normativa ya está publicada");
 
         normativa.setAccepted(true);
         normativa.setVisible(true);

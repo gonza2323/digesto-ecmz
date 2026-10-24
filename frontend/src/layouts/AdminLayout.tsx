@@ -6,7 +6,8 @@ import {AdminSidebar} from '@/components/AdminSidebar'
 import {useAuth} from '@/hooks/useAuth'
 
 export function AdminLayout() {
-    const {hasRole, logout} = useAuth()
+    const {user, hasRole, logout} = useAuth()
+    const roleLabel = hasRole('SUPERADMIN') ? 'Superadmin' : 'Admin'
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [backupAlert, setBackupAlert] = useState<{ meses: number } | null>(null)
 
@@ -29,7 +30,7 @@ export function AdminLayout() {
     return (
         <div className="min-h-screen bg-neutral-50 lg:grid lg:grid-cols-[16rem_1fr]">
             {/* Mobile topbar */}
-            <div className="lg:hidden flex items-center justify-between bg-institutional text-white px-4 py-3">
+            <div className="lg:hidden flex items-center justify-between bg-[#701f3a] text-white px-4 py-3">
                 <button
                     type="button"
                     onClick={() => setSidebarOpen(true)}
@@ -38,7 +39,7 @@ export function AdminLayout() {
                 >
                     <Menu className="w-5 h-5" aria-hidden="true"/>
                 </button>
-                <span className="font-display font-semibold">Digesto — Administración</span>
+                <span className="font-display font-semibold">{roleLabel} — {user?.displayName}</span>
                 <div className="w-7" aria-hidden="true"/>
             </div>
 
@@ -60,6 +61,16 @@ export function AdminLayout() {
                         <div className="flex-1 overflow-y-auto">
                             <AdminSidebar onNavigate={() => setSidebarOpen(false)}/>
                         </div>
+                        <div className="border-t border-neutral-200 p-3">
+                            <button
+                                type="button"
+                                onClick={() => void logout()}
+                                className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100"
+                            >
+                                <LogOut className="w-4 h-4 shrink-0" aria-hidden="true"/>
+                                Cerrar sesión
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
@@ -80,6 +91,9 @@ export function AdminLayout() {
             <div className="flex flex-col min-w-0">
                 <div
                     className="hidden lg:flex items-center justify-end gap-4 border-b border-neutral-200 bg-white px-6 py-3">
+                    <span className="text-sm font-medium text-[#701f3a]">
+                        {roleLabel} — {user?.displayName}
+                    </span>
                     <NavLink
                         to="/"
                         className="flex items-center gap-1.5 text-sm text-neutral-600 hover:text-institutional transition-colors"

@@ -10,6 +10,7 @@ import {getErrorMessage} from '@/utils/errors'
 
 type Pending =
     | { kind: 'delete'; id: string; title: string }
+    | { kind: 'submit'; id: string; title: string }
     | { kind: 'approve'; id: string; title: string }
     | { kind: 'reject'; id: string; title: string }
 
@@ -49,7 +50,19 @@ export function useNormativaActions(onDone: (kind: Pending['kind']) => void) {
             } else {
                 showToast('success', 'La normativa fue aprobada y ya es pública.')
             }
+
             onDone('approve')
+        } catch (error) {
+            showToast('error', getErrorMessage(error))
+        }
+    }
+
+    async function confirmSubmit(id: string) {
+        try {
+            await normativasApi.submitForApproval(id)
+            showToast('success', 'La normativa fue enviada a aprobación.')
+            close()
+            onDone('submit')
         } catch (error) {
             showToast('error', getErrorMessage(error))
         }
@@ -96,6 +109,22 @@ export function useNormativaActions(onDone: (kind: Pending['kind']) => void) {
                     confirmLabel="Aprobar"
                     onCancel={close}
                     onConfirm={() => confirmApprove(pending.id)}
+                />
+            )}
+
+            {pending?.kind === 'submit' && (
+                <ConfirmDialog
+                    title="Enviar a aprobación"
+                    variant="primary"
+                    description={
+                        <>
+                            La normativa <strong>{pending.title}</strong> será enviada a revisión del
+                            superadministrador.
+                        </>
+                    }
+                    confirmLabel="Enviar a aprobación"
+                    onCancel={close}
+                    onConfirm={() => confirmSubmit(pending.id)}
                 />
             )}
 
@@ -153,6 +182,7 @@ export function useNormativaActions(onDone: (kind: Pending['kind']) => void) {
     return {
         dialogs,
         askDelete: (id: string, title: string) => setPending({kind: 'delete', id, title}),
+        askSubmit: (id: string, title: string) => setPending({kind: 'submit', id, title}),
         askApprove: (id: string, title: string) => setPending({kind: 'approve', id, title}),
         askReject: (id: string, title: string) => setPending({kind: 'reject', id, title}),
     }
