@@ -47,8 +47,8 @@ export function UsuariosPage() {
                 <div>
                     <h1 className="text-xl sm:text-2xl font-semibold text-neutral-900">Usuarios</h1>
                     <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-                        Cuentas administrativas. Al crear un usuario, el sistema genera una contraseña provisoria y se
-                        la envía por correo.
+                        Cuentas administrativas. Al crear un usuario, se envía por correo un enlace para definir su
+                        contraseña.
                     </p>
                 </div>
                 <Button onClick={() => setEditing('new')}>
@@ -119,7 +119,7 @@ export function UsuariosPage() {
                         showToast(
                             'success',
                             created
-                                ? 'Usuario creado. Se le envió por correo una contraseña provisoria que deberá cambiar al ingresar.'
+                                ? 'Usuario creado. Se le envió por correo un enlace para definir su contraseña.'
                                 : 'Se guardaron los cambios.',
                         )
                         reload()
@@ -204,8 +204,8 @@ function UsuarioFormModal({
                 {submitError && <Alert variant="error">{submitError}</Alert>}
                 {!usuario && (
                     <Alert variant="info">
-                        No se solicita contraseña: el sistema genera una provisoria y la envía al correo indicado. La
-                        persona deberá cambiarla en su primer ingreso.
+                        No se solicita contraseña: se enviará al correo indicado un enlace de activación de un solo
+                        uso para definirla.
                     </Alert>
                 )}
 
