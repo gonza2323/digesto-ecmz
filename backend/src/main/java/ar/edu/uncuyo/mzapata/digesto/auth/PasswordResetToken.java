@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.Instant;
 
 /**
- * Enlace temporal para recuperar la contraseña.
+ * Enlace temporal para activar una cuenta o recuperar la contraseña.
  */
 @Entity
 @Getter
@@ -34,4 +34,6 @@ public class PasswordResetToken extends BaseEntity {
     private Instant expiresAt;
 
     private boolean used;
+
+    private boolean activation;
 }

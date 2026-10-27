@@ -61,12 +61,14 @@ export function ForgotPasswordPage() {
                     <Input
                         id="email"
                         type="email"
+                        maxLength={254}
                         autoComplete="email"
                         hasError={!!errors.email}
                         aria-invalid={!!errors.email}
                         {...register('email', {
                             required: 'Ingrese su email',
                             pattern: {value: /^\S+@\S+\.\S+$/, message: 'Ingrese un email válido'},
+                            maxLength: {value: 254, message: 'El email no puede superar los 254 caracteres'},
                         })}
                     />
                 </FormField>

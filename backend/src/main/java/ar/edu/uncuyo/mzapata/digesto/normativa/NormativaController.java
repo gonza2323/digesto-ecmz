@@ -1,6 +1,7 @@
 package ar.edu.uncuyo.mzapata.digesto.normativa;
 
 import ar.edu.uncuyo.mzapata.digesto.archivo.ArchivoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -25,7 +26,7 @@ public class NormativaController {
 
     @GetMapping
     public Page<NormativaSummaryDto> search(
-            NormativaFilterDto filtro,
+            @Valid NormativaFilterDto filtro,
             @PageableDefault(size = 10, sort = "releaseDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return normativaService.search(filtro, pageable);
     }

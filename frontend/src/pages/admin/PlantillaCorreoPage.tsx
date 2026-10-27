@@ -66,8 +66,14 @@ export function PlantillaCorreoPage() {
                 <FormField label="Asunto" htmlFor="asunto" required error={errors.asunto?.message}>
                     <Input
                         id="asunto"
+                        maxLength={255}
                         hasError={!!errors.asunto}
-                        {...register('asunto', {validate: (v) => v.trim().length > 0 || 'Ingrese el asunto'})}
+                        {...register('asunto', {
+                            validate: (v) =>
+                                v.trim().length > 0
+                                    ? v.length <= 255 || 'El asunto no puede superar los 255 caracteres'
+                                    : 'Ingrese el asunto',
+                        })}
                     />
                 </FormField>
 

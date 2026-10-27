@@ -46,7 +46,7 @@ export function FileDropzone({file, onChange, currentFile, error, required}: Fil
                     <>
                         <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-institutional" aria-hidden="true"/>
                         <div className="text-center">
-                            <p className="text-xs sm:text-sm font-medium text-neutral-700">{file.name}</p>
+                            <p className="max-w-full break-all text-xs sm:text-sm font-medium text-neutral-700">{file.name}</p>
                             <p className="text-xs text-neutral-500 mt-1">{formatFileSize(file.size)} — clic para
                                 reemplazar</p>
                         </div>
@@ -55,7 +55,7 @@ export function FileDropzone({file, onChange, currentFile, error, required}: Fil
                     <>
                         <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-institutional" aria-hidden="true"/>
                         <div className="text-center">
-                            <p className="text-xs sm:text-sm font-medium text-neutral-700">{currentFile.name}</p>
+                            <p className="max-w-full break-all text-xs sm:text-sm font-medium text-neutral-700">{currentFile.name}</p>
                             <p className="text-xs text-neutral-500 mt-1">
                                 {formatFileSize(currentFile.size)} — clic para reemplazar el PDF
                             </p>

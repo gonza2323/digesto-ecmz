@@ -43,6 +43,12 @@ export function LoginPage() {
 
     return (
         <AuthCard title="Iniciar sesión" subtitle="Acceso para personal administrativo del digesto.">
+            <Link
+                to="/"
+                className="inline-flex items-center text-sm text-institutional hover:underline mb-4"
+            >
+                Volver al sitio público
+            </Link>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
                 {submitError && <Alert variant="error">{submitError}</Alert>}
 
@@ -50,6 +56,7 @@ export function LoginPage() {
                     <Input
                         id="email"
                         type="email"
+                        maxLength={254}
                         autoComplete="username"
                         hasError={!!errors.email}
                         aria-invalid={!!errors.email}
@@ -57,6 +64,7 @@ export function LoginPage() {
                         {...register('email', {
                             required: 'Ingrese su email',
                             pattern: {value: /^\S+@\S+\.\S+$/, message: 'Ingrese un email válido'},
+                            maxLength: {value: 254, message: 'El email no puede superar los 254 caracteres'},
                         })}
                     />
                 </FormField>

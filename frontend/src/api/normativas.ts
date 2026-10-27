@@ -6,6 +6,7 @@ import type {
     NormativaFilters,
     NormativaFormValues,
     NormativaSummary,
+    Expediente,
 } from '@/types/normativa'
 
 export interface SearchOptions {
@@ -89,6 +90,14 @@ export const normativasApi = {
         return data.enUso
     },
 
+    async findExpediente(numero: number): Promise<Expediente | null> {
+        const {data} = await http.get<Expediente | null>(
+            '/api/admin/normativas/expediente',
+            {params: {numero}},
+        )
+        return data
+    },
+
     async create(values: NormativaFormValues, archivo: File): Promise<NormativaDetail> {
         const {data} = await http.post<NormativaDetail>(
             '/api/admin/normativas',
@@ -107,6 +116,11 @@ export const normativasApi = {
             `/api/admin/normativas/${id}`,
             buildNormativaFormData(values, archivo),
         )
+        return data
+    },
+
+    async submitForApproval(id: string): Promise<NormativaDetail> {
+        const {data} = await http.post<NormativaDetail>(`/api/admin/normativas/${id}/enviar-aprobacion`)
         return data
     },
 

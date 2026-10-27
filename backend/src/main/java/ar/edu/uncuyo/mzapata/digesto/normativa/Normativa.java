@@ -63,9 +63,7 @@ public class Normativa extends BaseEntity {
 
     private boolean accepted;
 
-    /**
-     * Enviada a aprobación; si es false y no está aceptada, es un borrador.
-     */
+    /** Indica que la normativa está esperando la decisión de un superadministrador. */
     private boolean pendingApproval;
 
     /**
@@ -106,8 +104,7 @@ public class Normativa extends BaseEntity {
 
     public String estado() {
         if (accepted && visible) return "PUBLICADA";
-        if (pendingApproval) return "PENDIENTE";
-        return "BORRADOR";
+        return pendingApproval ? "PENDIENTE" : "NO PUBLICADA";
     }
 
     public void replaceNotificaciones(List<String> emails) {

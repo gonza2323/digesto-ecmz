@@ -1,6 +1,7 @@
 package ar.edu.uncuyo.mzapata.digesto.normativa;
 
 import ar.edu.uncuyo.mzapata.digesto.archivo.ArchivoService;
+import ar.edu.uncuyo.mzapata.digesto.expediente.ExpedienteDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Panel de administración: incluye borradores y pendientes de aprobación.
+ * Panel de administración: incluye normativas no publicadas y pendientes de aprobación.
  */
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class NormativaAdminController {
 
     @GetMapping
     public Page<NormativaSummaryDto> list(
-            NormativaFilterDto filtro,
+            @Valid NormativaFilterDto filtro,
             @RequestParam(defaultValue = "false") boolean pendientes,
             @PageableDefault(size = 10, sort = "loadDate", direction = Sort.Direction.DESC) Pageable pageable) {
         return normativaService.searchAdmin(filtro, pendientes, pageable);
@@ -39,6 +40,11 @@ public class NormativaAdminController {
     @GetMapping("/expediente-en-uso")
     public Map<String, Boolean> expedienteEnUso(@RequestParam Integer numero) {
         return Map.of("enUso", normativaService.expedienteEnUso(numero));
+    }
+
+    @GetMapping("/expediente")
+    public ExpedienteDto expediente(@RequestParam Integer numero) {
+        return normativaService.findExpediente(numero);
     }
 
     @GetMapping("/{id}")
@@ -63,6 +69,11 @@ public class NormativaAdminController {
                                      @Valid @RequestPart NormativaFormDto normativa,
                                      @RequestPart(required = false) MultipartFile archivo) {
         return normativaService.update(id, normativa, archivo);
+    }
+
+    @PostMapping("/{id}/enviar-aprobacion")
+    public NormativaDetailDto submitForApproval(@PathVariable UUID id) {
+        return normativaService.submitForApproval(id);
     }
 
     @DeleteMapping("/{id}")

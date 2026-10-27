@@ -1,5 +1,8 @@
 package ar.edu.uncuyo.mzapata.digesto.user;
 
+import ar.edu.uncuyo.mzapata.digesto.auth.PasswordResetToken;
+import ar.edu.uncuyo.mzapata.digesto.auth.PasswordResetTokenRepository;
+import ar.edu.uncuyo.mzapata.digesto.config.AppProperties;
 import ar.edu.uncuyo.mzapata.digesto.config.BusinessException;
 import ar.edu.uncuyo.mzapata.digesto.mail.MailService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final AppProperties properties;
     private final SecureRandom random = new SecureRandom();
 
     @Transactional(readOnly = true)
@@ -32,31 +37,38 @@ public class UsuarioService {
                 .orElseThrow(() -> BusinessException.notFound("El usuario no existe"));
     }
 
-    /**
-     * Crea el usuario con una contraseña generada que se envía por correo.
-     */
+    /** Crea el usuario y envía un enlace de activación de un solo uso. */
     @Transactional
     public UsuarioDto create(UsuarioFormDto dto) {
         String email = dto.email().trim().toLowerCase();
         if (usuarioRepository.existsByEmailAndDeletedFalse(email))
             throw new BusinessException("Ya existe un usuario con ese email");
 
-        String password = generatePassword();
-
         Usuario usuario = usuarioRepository.save(Usuario.builder()
                 .firstname(dto.firstname().trim())
                 .lastname(dto.lastname().trim())
                 .email(email)
-                .passwordHash(passwordEncoder.encode(password))
+                .passwordHash(passwordEncoder.encode(randomToken()))
                 .mustChangePassword(true)
                 .role(dto.role())
                 .build());
 
+        PasswordResetToken token = tokenRepository.save(PasswordResetToken.builder()
+                .token(UUID.randomUUID().toString())
+                .usuario(usuario)
+                .expiresAt(java.time.Instant.now().plusSeconds(
+                        60 * properties.auth().passwordReset().durationMinutes()))
+                .used(false)
+                .activation(true)
+                .build());
+
         mailService.send(email,
-                "Digesto - Acceso al sistema",
-                "Se creó su cuenta en el Digesto.\n\nEmail: " + email
-                        + "\nContraseña provisoria: " + password
-                        + "\n\nDeberá cambiarla la primera vez que ingrese.");
+                "Digesto - Activación de cuenta",
+                "Se creó su cuenta en el Digesto.\n\n"
+                        + "Para definir su contraseña ingrese a:\n\n"
+                        + properties.frontendUrl() + "/reset-password?token=" + token.getToken()
+                        + "\n\nEl enlace vence en "
+                        + properties.auth().passwordReset().durationMinutes() + " minutos.");
 
         return UsuarioDto.of(usuario);
     }
@@ -84,7 +96,7 @@ public class UsuarioService {
         find(id).setDeleted(true);
     }
 
-    private String generatePassword() {
+    private String randomToken() {
         byte[] bytes = new byte[9];
         random.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);

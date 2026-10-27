@@ -11,6 +11,7 @@ interface ModalProps {
 
 export function Modal({title, onClose, children, footer, widthClassName = 'max-w-md'}: ModalProps) {
     const panelRef = useRef<HTMLDivElement>(null)
+    const initialFocusDoneRef = useRef(false)
 
     useEffect(() => {
         function onKeyDown(event: KeyboardEvent) {
@@ -18,7 +19,10 @@ export function Modal({title, onClose, children, footer, widthClassName = 'max-w
         }
 
         document.addEventListener('keydown', onKeyDown)
-        panelRef.current?.querySelector<HTMLElement>('button, input, textarea, select')?.focus()
+        if (!initialFocusDoneRef.current) {
+            panelRef.current?.querySelector<HTMLElement>('input, textarea, select, button')?.focus()
+            initialFocusDoneRef.current = true
+        }
         return () => document.removeEventListener('keydown', onKeyDown)
     }, [onClose])
 

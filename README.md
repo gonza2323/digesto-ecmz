@@ -72,7 +72,7 @@ PDF conservan la sesión del usuario y permiten abrir el documento o descargarlo
 
 Una normativa puede pasar por estos estados:
 
-1. **Borrador:** fue cargada pero todavía no se envió a revisión.
+1. **No publicada:** fue cargada, pero todavía no está visible en el sitio público.
 2. **Pendiente:** fue enviada a revisión.
 3. **Publicada:** fue aprobada y es visible en el sitio público.
 
@@ -166,7 +166,7 @@ También se crean automáticamente los tipos de normativa y autoridades iniciale
 Un admin puede:
 
 - Crear y editar normativas.
-- Guardarlas como borrador o enviarlas a aprobación.
+- Enviar normativas a aprobación.
 - Administrar tipos de documento y autoridades.
 - Consultar y descargar PDFs.
 - Cambiar su propia contraseña.
@@ -345,6 +345,4 @@ Internet
 El repositorio no incluye una configuración automática de producción, Dockerfiles
 ni un pipeline de publicación. Esas piezas deben definirse según el servidor o
 proveedor elegido.
-
-
 

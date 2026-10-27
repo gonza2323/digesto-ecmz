@@ -3,6 +3,7 @@ export type UserRole = 'ADMIN' | 'SUPERADMIN'
 /** AuthUserDto */
 export interface AuthUser {
     userId: string
+    displayName: string
     roles: UserRole[]
     mustChangePassword: boolean
 }

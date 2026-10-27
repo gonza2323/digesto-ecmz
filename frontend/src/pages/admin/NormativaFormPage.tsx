@@ -1,5 +1,5 @@
-import {Plus, Save, Send, X} from 'lucide-react'
-import {useEffect, useRef, useState} from 'react'
+import {Plus, Send, X} from 'lucide-react'
+import {useEffect, useState} from 'react'
 import {useForm} from 'react-hook-form'
 import {useNavigate, useParams} from 'react-router-dom'
 import {autoridadesApi} from '@/api/autoridades'
@@ -19,15 +19,18 @@ import type {NormativaFormValues} from '@/types/normativa'
 import {getErrorMessage, getFieldErrors} from '@/utils/errors'
 
 /** Form state: everything in NormativaFormDto except the fields managed outside RHF. */
-type FormValues = Omit<NormativaFormValues, 'notificaciones' | 'enviarAAprobacion'>
+type FormValues = Omit<NormativaFormValues, 'notificaciones'>
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/
 
 /** Matches spring.servlet.multipart.max-file-size in the backend. */
 const MAX_FILE_BYTES = 50 * 1024 * 1024
+const MAX_NUMBER = 999999999
+const MAX_TITLE_LENGTH = 255
 
 const positiveInteger = (message: string) => (value: number) =>
-    (Number.isInteger(value) && value > 0) || message
+    (Number.isInteger(value) && value > 0 && value <= MAX_NUMBER) ||
+    (Number.isFinite(value) && value > MAX_NUMBER ? 'El número es excesivamente largo' : message)
 
 const emptyValues: FormValues = {
     number: NaN,
@@ -53,8 +56,6 @@ export function NormativaFormPage() {
     const [emailError, setEmailError] = useState<string | undefined>()
     const [submitError, setSubmitError] = useState<string | null>(null)
     const [expedienteEnUso, setExpedienteEnUso] = useState(false)
-    const submitMode = useRef<'borrador' | 'aprobacion'>('borrador')
-    const originalRecordNumber = useRef<number | null>(null)
 
     const catalogs = useAsyncData(
         () => Promise.all([tiposDocumentoApi.list(), autoridadesApi.list()]),
@@ -72,6 +73,7 @@ export function NormativaFormPage() {
         handleSubmit,
         reset,
         watch,
+        setValue,
         setError,
         formState: {errors, isSubmitting},
     } = useForm<FormValues>({defaultValues: emptyValues})
@@ -80,7 +82,6 @@ export function NormativaFormPage() {
     useEffect(() => {
         const normativa = existing.data
         if (!normativa) return
-        originalRecordNumber.current = normativa.recordNumber
         reset({
             number: normativa.number,
             title: normativa.title,
@@ -94,35 +95,41 @@ export function NormativaFormPage() {
         setEmails(normativa.notificaciones ?? [])
     }, [existing.data, reset])
 
-    // Informational check (never blocks): warn when the expediente number is already used.
+    // Existing expedientes keep their title; new expedientes can be named freely.
     const recordNumber = watch('recordNumber')
+    const expedienteExistente = expedienteEnUso
     useEffect(() => {
         if (!Number.isInteger(recordNumber) || recordNumber <= 0) {
-            setExpedienteEnUso(false)
-            return
-        }
-        if (isEdit && recordNumber === originalRecordNumber.current) {
             setExpedienteEnUso(false)
             return
         }
         let active = true
         const timer = window.setTimeout(() => {
             normativasApi
-                .expedienteEnUso(recordNumber)
-                .then((inUse) => active && setExpedienteEnUso(inUse))
+                .findExpediente(recordNumber)
+                .then((expediente) => {
+                    if (!active) return
+                    setExpedienteEnUso(Boolean(expediente))
+                    if (expediente) setValue('recordTitle', expediente.recordTitle)
+                    else setValue('recordTitle', '')
+                })
                 .catch(() => active && setExpedienteEnUso(false))
         }, 400)
         return () => {
             active = false
             window.clearTimeout(timer)
         }
-    }, [recordNumber, isEdit])
+    }, [recordNumber, setValue])
 
     function addEmail() {
         const value = emailDraft.trim()
         if (!value) return
         if (!EMAIL_PATTERN.test(value)) {
             setEmailError('Ingrese una dirección de correo válida')
+            return
+        }
+        if (value.length > 254) {
+            setEmailError('La dirección de correo no puede superar los 254 caracteres')
             return
         }
         if (emails.some((email) => email.toLowerCase() === value.toLowerCase())) {
@@ -157,7 +164,6 @@ export function NormativaFormPage() {
             description: values.description.trim(),
             recordTitle: values.recordTitle.trim(),
             notificaciones: emails,
-            enviarAAprobacion: submitMode.current === 'aprobacion',
         }
 
         try {
@@ -165,12 +171,7 @@ export function NormativaFormPage() {
                 isEdit && id
                     ? await normativasApi.update(id, payload, archivo)
                     : await normativasApi.create(payload, archivo as File)
-            showToast(
-                'success',
-                payload.enviarAAprobacion
-                    ? 'La normativa fue enviada a aprobación.'
-                    : 'La normativa se guardó como borrador.',
-            )
+            showToast('success', 'Normativa guardada. Revise la previsualización para continuar.')
             navigate(`/admin/normativas/${saved.id}`, {replace: true})
         } catch (error) {
             const fieldErrors = getFieldErrors(error)
@@ -194,7 +195,7 @@ export function NormativaFormPage() {
                 {isEdit ? 'Editar normativa' : 'Nueva normativa'}
             </h1>
             <p className="text-xs sm:text-sm text-neutral-600 mt-1 mb-5">
-                Complete los campos. Puede guardar como borrador o enviarla a aprobación.
+                Complete los campos para enviarla a aprobación.
             </p>
 
             {publishedWarning && (
@@ -224,12 +225,18 @@ export function NormativaFormPage() {
                     required={!isEdit}
                 />
 
-                <FormField label="Título" htmlFor="title" required error={errors.title?.message}>
+                <FormField label="Título de la normativa" htmlFor="title" required error={errors.title?.message}>
                     <Input
                         id="title"
+                        maxLength={MAX_TITLE_LENGTH}
                         hasError={!!errors.title}
                         placeholder="Ej: Reglamento Interno 2026"
-                        {...register('title', {validate: (v) => v.trim().length > 0 || 'Ingrese el título'})}
+                        {...register('title', {
+                            validate: (v) =>
+                                v.trim().length > 0
+                                    ? v.length <= MAX_TITLE_LENGTH || 'El título no puede superar los 255 caracteres'
+                                    : 'Ingrese el título',
+                        })}
                     />
                 </FormField>
 
@@ -262,7 +269,7 @@ export function NormativaFormPage() {
                         </Select>
                     </FormField>
 
-                    <FormField label="Autoridad" htmlFor="autoridadId" required error={errors.autoridadId?.message}>
+                    <FormField label="Autoridad emisora" htmlFor="autoridadId" required error={errors.autoridadId?.message}>
                         <Select
                             id="autoridadId"
                             hasError={!!errors.autoridadId}
@@ -288,6 +295,7 @@ export function NormativaFormPage() {
                             id="number"
                             type="number"
                             min={1}
+                            max={MAX_NUMBER}
                             placeholder="Ej: 145"
                             hasError={!!errors.number}
                             {...register('number', {
@@ -308,7 +316,7 @@ export function NormativaFormPage() {
                     </FormField>
 
                     <FormField
-                        label="Número de expediente"
+                        label="Número de expediente asociado"
                         htmlFor="recordNumber"
                         required
                         error={errors.recordNumber?.message}
@@ -317,6 +325,7 @@ export function NormativaFormPage() {
                             id="recordNumber"
                             type="number"
                             min={1}
+                            max={MAX_NUMBER}
                             hasError={!!errors.recordNumber}
                             {...register('recordNumber', {
                                 valueAsNumber: true,
@@ -329,8 +338,13 @@ export function NormativaFormPage() {
                                error={errors.recordTitle?.message}>
                         <Input
                             id="recordTitle"
+                            disabled={expedienteExistente}
                             hasError={!!errors.recordTitle}
                             {...register('recordTitle', {
+                                maxLength: {
+                                    value: MAX_TITLE_LENGTH,
+                                    message: 'El título del expediente no puede superar los 255 caracteres',
+                                },
                                 validate: (v) => v.trim().length > 0 || 'Ingrese el título del expediente',
                             })}
                         />
@@ -348,7 +362,7 @@ export function NormativaFormPage() {
                     <label htmlFor="emailDraft" className="block text-xs sm:text-sm font-medium text-neutral-700 mb-2">
                         Correos a notificar al aprobar
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row">
                         <Input
                             id="emailDraft"
                             type="email"
@@ -405,20 +419,10 @@ export function NormativaFormPage() {
                     </Button>
                     <Button
                         type="submit"
-                        variant="secondary"
-                        disabled={isSubmitting}
-                        onClick={() => (submitMode.current = 'borrador')}
-                    >
-                        <Save className="w-4 h-4" aria-hidden="true"/>
-                        Guardar borrador
-                    </Button>
-                    <Button
-                        type="submit"
                         loading={isSubmitting}
-                        onClick={() => (submitMode.current = 'aprobacion')}
                     >
                         <Send className="w-4 h-4" aria-hidden="true"/>
-                        Enviar a aprobación
+                        Continuar
                     </Button>
                 </div>
             </form>

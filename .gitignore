@@ -68,3 +68,4 @@ storage/
 # Backups locales
 *.bak
 *~
+/ngrok.yml
