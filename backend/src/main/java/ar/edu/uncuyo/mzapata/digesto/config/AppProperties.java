@@ -12,7 +12,8 @@ public record AppProperties(
         List<String> corsOrigins,
         Storage storage,
         Mail mail,
-        Backup backup
+        Backup backup,
+        Ocr ocr
 ) {
     public record Auth(PasswordReset passwordReset) {
         public record PasswordReset(long durationMinutes) {
@@ -35,5 +36,11 @@ public record AppProperties(
      * Binarios de PostgreSQL usados para el dump/restauración y umbral de la alerta.
      */
     public record Backup(String pgDump, String psql, int alertMonths) {
+    }
+
+    /**
+     * Parámetros del OCR aplicado a los PDF sin capa de texto.
+     */
+    public record Ocr(String tesseract, String language, int dpi, int psm, long timeoutSeconds) {
     }
 }

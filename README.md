@@ -68,6 +68,13 @@ Las operaciones habituales usan JSON. La creación y edición de normativas env�
 un formulario `multipart` con los datos de la normativa y el PDF. Las descargas de
 PDF conservan la sesión del usuario y permiten abrir el documento o descargarlo.
 
+Para la búsqueda por palabra clave, el servidor usa el texto embebido en el PDF.
+Si el documento no tiene capa de texto (por ejemplo, un escaneo), aplica OCR con
+Tesseract a 300 DPI e idioma español. El OCR se ejecuta durante la carga, por lo
+que los PDF escaneados pueden tardar más en guardarse. Si Tesseract no está
+disponible o falla, la normativa se guarda igualmente, pero sin texto para la
+búsqueda.
+
 ## Estados de una normativa
 
 Una normativa puede pasar por estos estados:
@@ -88,9 +95,29 @@ Para trabajar localmente se necesita:
 - Node.js y npm.
 - Docker y Docker Compose.
 - PostgreSQL 16 o su imagen en Docker.
+- Tesseract OCR con datos de idioma español, para los PDF escaneados.
 
 Para backups y restauraciones también deben estar disponibles los comandos
 `pg_dump` y `psql`.
+
+### Instalar Tesseract (OCR)
+
+Los PDF escaneados se procesan con Tesseract. Instalar el motor y el paquete de
+idioma español según la distribución:
+
+```bash
+# Fedora
+sudo dnf install tesseract tesseract-langpack-spa
+
+# Debian/Ubuntu
+sudo apt install tesseract-ocr tesseract-ocr-spa
+```
+
+Verificar que `spa` aparezca en la lista de idiomas:
+
+```bash
+tesseract --list-langs
+```
 
 ## Desarrollo local (dev)
 
@@ -267,6 +294,11 @@ Las variables más relevantes son:
 | `MAIL_PASSWORD` | Contraseña del correo                                                        |
 | `MAIL_FROM`     | Dirección que aparece como remitente                                         |
 | `STORAGE_DIR`   | Carpeta donde se guardan los PDF                                             |
+| `TESSERACT`     | Binario de Tesseract usado para OCR; por defecto `tesseract`                 |
+| `OCR_LANG`      | Idiomas de Tesseract; por defecto `spa`                                      |
+| `OCR_DPI`       | Resolución usada al renderizar páginas para OCR; por defecto `300`           |
+| `OCR_PSM`       | Modo de segmentación de Tesseract; por defecto `3`                           |
+| `OCR_TIMEOUT_SECONDS` | Tiempo máximo de OCR por página; por defecto `120`                     |
 | `PG_DUMP`       | Ubicación de `pg_dump`                                                       |
 | `PSQL`          | Ubicación de `psql`                                                          |
 
@@ -314,6 +346,7 @@ El archivo generado queda en `backend/target/`. Ejecutarlo en un servidor con:
 - Acceso a PostgreSQL.
 - Una carpeta persistente para los PDF.
 - `pg_dump` y `psql`.
+- Tesseract con el paquete de idioma español, si se cargan PDF escaneados.
 - Las variables de correo configuradas si se necesitan notificaciones.
 
 ### Preparar la interfaz
