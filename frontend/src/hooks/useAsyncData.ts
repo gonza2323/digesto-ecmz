@@ -37,5 +37,9 @@ export function useAsyncData<T>(fetcher: () => Promise<T>, deps: readonly unknow
 
     const reload = useCallback(() => setReloadKey((key) => key + 1), [])
 
-    return {...state, reload}
+    const updateData = useCallback((updater: (previous: T | null) => T | null) => {
+        setState((previous) => ({...previous, data: updater(previous.data), error: null}))
+    }, [])
+
+    return {...state, reload, updateData}
 }

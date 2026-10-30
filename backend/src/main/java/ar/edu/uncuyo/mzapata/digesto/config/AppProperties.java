@@ -35,7 +35,8 @@ public record AppProperties(
     /**
      * Binarios de PostgreSQL usados para el dump/restauración y umbral de la alerta.
      */
-    public record Backup(String pgDump, String psql, int alertMonths) {
+    public record Backup(String pgDump, String psql, int alertMonths,
+                         String mode, String dockerBin, String dockerContainer) {
     }
 
     /**

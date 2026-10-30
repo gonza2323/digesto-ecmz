@@ -10,12 +10,13 @@ import {ErrorState, LoadingState} from '@/components/ui/States'
 import {useAsyncData} from '@/hooks/useAsyncData'
 import {useAuth} from '@/hooks/useAuth'
 import {useToast} from '@/hooks/useToast'
+import {notifyBackupCreated} from '@/utils/backupEvents'
 import {getErrorMessage} from '@/utils/errors'
 import {formatDateTime, formatFileSize} from '@/utils/format'
 
 export function BackupsPage() {
     const {showToast} = useToast()
-    const {data: status, loading, error, reload} = useAsyncData(() => backupsApi.estado(), [])
+    const {data: status, loading, error, reload, updateData} = useAsyncData(() => backupsApi.estado(), [])
 
     const [creating, setCreating] = useState(false)
     const [restoreOpen, setRestoreOpen] = useState(false)
@@ -24,6 +25,11 @@ export function BackupsPage() {
         setCreating(true)
         try {
             await backupsApi.crearYDescargar()
+            const ahora = new Date().toISOString()
+            updateData((previous) =>
+                previous ? {...previous, ultimoBackup: ahora, alerta: false} : previous,
+            )
+            notifyBackupCreated()
             showToast('success', 'El backup se generó y comenzó a descargarse.')
             reload()
         } catch (err) {

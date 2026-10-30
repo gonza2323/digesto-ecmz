@@ -4,6 +4,7 @@ import {NavLink, Outlet} from 'react-router-dom'
 import {backupsApi} from '@/api/backups'
 import {AdminSidebar} from '@/components/AdminSidebar'
 import {useAuth} from '@/hooks/useAuth'
+import {onBackupCreated} from '@/utils/backupEvents'
 
 export function AdminLayout() {
     const {user, hasRole, logout} = useAuth()
@@ -26,6 +27,8 @@ export function AdminLayout() {
             active = false
         }
     }, [hasRole])
+
+    useEffect(() => onBackupCreated(() => setBackupAlert(null)), [])
 
     return (
         <div className="min-h-screen bg-neutral-50 lg:grid lg:grid-cols-[16rem_1fr]">
