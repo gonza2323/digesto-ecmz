@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,14 @@ public class BackupService {
     private static final String MANIFEST_ENTRY = "manifest.txt";
     private static final String FILES_PREFIX = "archivos/";
     private static final Pattern JDBC_URL = Pattern.compile("jdbc:postgresql://([^:/]+):(\\d+)/(\\S+)");
+
+    /**
+     * {@code pg_dump} 17+ agrega {@code SET transaction_timeout = 0;} al encabezado, pero
+     * PostgreSQL 16 no reconoce ese parámetro. Se elimina solo la primera aparición (la del
+     * encabezado) para no tocar líneas de datos de {@code COPY}.
+     */
+    private static final Pattern PARAMETRO_POSTGRES_17 = Pattern.compile(
+            "(?m)^SET transaction_timeout[ \\t]*=[ \\t]*[^;\\r\\n]+;[ \\t]*\\r?\\n?");
 
     private final AppProperties properties;
     private final ArchivoRepository archivoRepository;
@@ -99,6 +108,7 @@ public class BackupService {
         try {
             Path dump = Files.createTempFile("digesto-dump-", ".sql");
             runPgDump(dump);
+            sanearDump(dump);
 
             List<Archivo> archivos = archivoRepository.findAll();
             Path zip = Files.createTempFile("digesto-backup-", ".zip");
@@ -191,7 +201,26 @@ public class BackupService {
             Files.deleteIfExists(dump);
             throw new BusinessException("El dump de la base de datos no es válido");
         }
+
+        sanearDump(dump);
         return dump;
+    }
+
+    /**
+     * Quita del dump los parámetros que el motor de destino no reconoce. Es idempotente:
+     * si el dump ya fue generado por un cliente compatible, no modifica nada.
+     */
+    private void sanearDump(Path dump) throws IOException {
+        String contenido = Files.readString(dump, StandardCharsets.UTF_8);
+        String limpio = sinParametrosNoSoportados(contenido);
+        if (limpio.equals(contenido)) return;
+
+        Files.writeString(dump, limpio, StandardCharsets.UTF_8);
+        log.info("Se quitó SET transaction_timeout del dump para poder restaurarlo en PostgreSQL 16");
+    }
+
+    static String sinParametrosNoSoportados(String contenido) {
+        return PARAMETRO_POSTGRES_17.matcher(contenido).replaceFirst("");
     }
 
     /**
@@ -268,24 +297,82 @@ public class BackupService {
 
     private void runPgDump(Path salida) {
         Matcher conexion = conexion();
-        run(List.of(properties.backup().pgDump(),
-                "-h", conexion.group(1),
-                "-p", conexion.group(2),
-                "-U", datasourceUsername,
-                "-d", conexion.group(3),
-                "--clean", "--if-exists", "--no-owner", "--no-privileges"), salida);
+        boolean docker = modoDocker();
+
+        List<String> command = comandoBase(docker ? "pg_dump" : properties.backup().pgDump(), false);
+        if (!docker) {
+            command.add("-h");
+            command.add(conexion.group(1));
+            command.add("-p");
+            command.add(conexion.group(2));
+        }
+        command.add("-U");
+        command.add(datasourceUsername);
+        command.add("-d");
+        command.add(conexion.group(3));
+        command.add("--clean");
+        command.add("--if-exists");
+        command.add("--no-owner");
+        command.add("--no-privileges");
+        command.add("--no-password");
+
+        run(command, salida, null);
     }
 
     private void runPsqlRestore(Path dump) {
         Matcher conexion = conexion();
-        run(List.of(properties.backup().psql(),
-                "-h", conexion.group(1),
-                "-p", conexion.group(2),
-                "-U", datasourceUsername,
-                "-d", conexion.group(3),
-                "-v", "ON_ERROR_STOP=1",
-                "--single-transaction",
-                "-f", dump.toAbsolutePath().toString()), null);
+        boolean docker = modoDocker();
+
+        List<String> command = comandoBase(docker ? "psql" : properties.backup().psql(), docker);
+        if (!docker) {
+            command.add("-h");
+            command.add(conexion.group(1));
+            command.add("-p");
+            command.add(conexion.group(2));
+        }
+        command.add("-U");
+        command.add(datasourceUsername);
+        command.add("-d");
+        command.add(conexion.group(3));
+        command.add("-v");
+        command.add("ON_ERROR_STOP=1");
+        command.add("--single-transaction");
+        command.add("--no-password");
+
+        if (docker) {
+            run(command, null, dump);
+        } else {
+            command.add("-f");
+            command.add(dump.toAbsolutePath().toString());
+            run(command, null, null);
+        }
+    }
+
+    private boolean modoDocker() {
+        return "docker".equalsIgnoreCase(properties.backup().mode());
+    }
+
+    /**
+     * En modo Docker el comando corre dentro del contenedor, usando su socket local y la
+     * misma versión de pg_dump/psql que el motor. {@code conEntrada} agrega {@code -i} para
+     * que psql pueda leer el dump por stdin.
+     */
+    private List<String> comandoBase(String binario, boolean conEntrada) {
+        List<String> command = new ArrayList<>();
+        if (!modoDocker()) {
+            command.add(binario);
+            return command;
+        }
+
+        AppProperties.Backup backup = properties.backup();
+        command.add(backup.dockerBin());
+        command.add("exec");
+        if (conEntrada) command.add("-i");
+        command.add("-e");
+        command.add("PGPASSWORD");
+        command.add(backup.dockerContainer());
+        command.add(binario);
+        return command;
     }
 
     private Matcher conexion() {
@@ -295,10 +382,12 @@ public class BackupService {
         return matcher;
     }
 
-    private void run(List<String> command, Path stdout) {
+    private void run(List<String> command, Path stdout, Path stdin) {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.environment().put("PGPASSWORD", datasourcePassword);
+            if (stdin != null)
+                builder.redirectInput(stdin.toFile());
 
             Path errores = Files.createTempFile("digesto-proc-", ".log");
             builder.redirectError(errores.toFile());
