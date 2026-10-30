@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,11 +48,6 @@ public class BackupService {
     private static final String FILES_PREFIX = "archivos/";
     private static final Pattern JDBC_URL = Pattern.compile("jdbc:postgresql://([^:/]+):(\\d+)/(\\S+)");
 
-    /**
-     * {@code pg_dump} 17+ agrega {@code SET transaction_timeout = 0;} al encabezado, pero
-     * PostgreSQL 16 no reconoce ese parámetro. Se elimina solo la primera aparición (la del
-     * encabezado) para no tocar líneas de datos de {@code COPY}.
-     */
     private static final Pattern PARAMETRO_POSTGRES_17 = Pattern.compile(
             "(?m)^SET transaction_timeout[ \\t]*=[ \\t]*[^;\\r\\n]+;[ \\t]*\\r?\\n?");
 
@@ -94,8 +89,12 @@ public class BackupService {
             return new BackupStatusDto(null, true, meses);
 
         Instant ultimo = Instant.parse(stored);
-        boolean alerta = ultimo.isBefore(Instant.now().minus(meses * 30L, ChronoUnit.DAYS));
+        boolean alerta = vencido(ultimo, meses, Instant.now());
         return new BackupStatusDto(ultimo, alerta, meses);
+    }
+
+    static boolean vencido(Instant ultimo, int meses, Instant ahora) {
+        return ultimo.atZone(ZoneOffset.UTC).plusMonths(meses).toInstant().isBefore(ahora);
     }
 
     // ---------- Restauración ----------
@@ -206,10 +205,6 @@ public class BackupService {
         return dump;
     }
 
-    /**
-     * Quita del dump los parámetros que el motor de destino no reconoce. Es idempotente:
-     * si el dump ya fue generado por un cliente compatible, no modifica nada.
-     */
     private void sanearDump(Path dump) throws IOException {
         String contenido = Files.readString(dump, StandardCharsets.UTF_8);
         String limpio = sinParametrosNoSoportados(contenido);
@@ -352,11 +347,6 @@ public class BackupService {
         return "docker".equalsIgnoreCase(properties.backup().mode());
     }
 
-    /**
-     * En modo Docker el comando corre dentro del contenedor, usando su socket local y la
-     * misma versión de pg_dump/psql que el motor. {@code conEntrada} agrega {@code -i} para
-     * que psql pueda leer el dump por stdin.
-     */
     private List<String> comandoBase(String binario, boolean conEntrada) {
         List<String> command = new ArrayList<>();
         if (!modoDocker()) {

@@ -33,9 +33,7 @@ public record AppProperties(
     }
 
     /**
-     * Ejecución del dump/restauración y umbral de la alerta. En modo {@code host} se usan
-     * los binarios {@code pgDump}/{@code psql}; en modo {@code docker} se ejecutan dentro
-     * del contenedor indicado por {@code dockerContainer} mediante {@code dockerBin}.
+     * Binarios de PostgreSQL usados para el dump/restauración y umbral de la alerta.
      */
     public record Backup(String pgDump, String psql, int alertMonths,
                          String mode, String dockerBin, String dockerContainer) {
