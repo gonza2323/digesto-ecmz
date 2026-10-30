@@ -69,11 +69,11 @@ un formulario `multipart` con los datos de la normativa y el PDF. Las descargas 
 PDF conservan la sesión del usuario y permiten abrir el documento o descargarlo.
 
 Para la búsqueda por palabra clave, el servidor usa el texto embebido en el PDF.
-Si el documento no tiene capa de texto (por ejemplo, un escaneo), aplica OCR con
-Tesseract a 300 DPI e idioma español. El OCR se ejecuta durante la carga, por lo
-que los PDF escaneados pueden tardar más en guardarse. Si Tesseract no está
-disponible o falla, la normativa se guarda igualmente, pero sin texto para la
-búsqueda.
+Si el documento no tiene capa de texto (por ejemplo, un escaneo), la normativa se
+guarda de inmediato y el OCR con Tesseract (300 DPI, idioma español) se ejecuta
+en segundo plano. El texto para la búsqueda puede aparecer unos segundos después
+de la carga. Si Tesseract no está disponible o falla, la normativa se conserva,
+pero sin texto para la búsqueda.
 
 ## Estados de una normativa
 

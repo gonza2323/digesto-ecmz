@@ -16,11 +16,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 class ArchivoServiceTest {
 
@@ -28,40 +23,30 @@ class ArchivoServiceTest {
     Path storageDir;
 
     @Test
-    void usesEmbeddedTextWithoutOcr() throws IOException {
-        TesseractOcrService ocrService = mock(TesseractOcrService.class);
+    void extractsEmbeddedText() throws IOException {
         Archivo archivo = pdfWithText("Documento con texto");
 
-        String text = service(ocrService).extractText(archivo);
+        String text = service().extractEmbeddedText(archivo);
 
         assertEquals("Documento con texto", text);
-        verifyNoInteractions(ocrService);
     }
 
     @Test
-    void usesOcrWhenPdfHasNoEmbeddedText() throws IOException {
-        TesseractOcrService ocrService = mock(TesseractOcrService.class);
-        when(ocrService.extractText(any())).thenReturn("hola cómo estás?");
+    void returnsNullWhenPdfHasNoText() throws IOException {
         Archivo archivo = blankPdf();
 
-        String text = service(ocrService).extractText(archivo);
-
-        assertEquals("hola cómo estás?", text);
-        verify(ocrService).extractText(any(Path.class));
+        assertNull(service().extractEmbeddedText(archivo));
     }
 
     @Test
-    void returnsNullWhenOcrFindsNothing() throws IOException {
-        TesseractOcrService ocrService = mock(TesseractOcrService.class);
-        when(ocrService.extractText(any())).thenReturn(" \n ");
-        Archivo archivo = blankPdf();
+    void returnsNullWhenPdfCannotBeRead() throws IOException {
+        Path path = storageDir.resolve("roto.pdf");
+        Files.writeString(path, "esto no es un PDF");
 
-        String text = service(ocrService).extractText(archivo);
-
-        assertNull(text);
+        assertNull(service().extractEmbeddedText(archivo(path)));
     }
 
-    private ArchivoService service(TesseractOcrService ocrService) {
+    private ArchivoService service() {
         AppProperties properties = new AppProperties(
                 null,
                 null,
@@ -72,7 +57,7 @@ class ArchivoServiceTest {
                 null,
                 new AppProperties.Ocr("tesseract", "spa", 300, 3, 120));
 
-        return new ArchivoService(properties, ocrService);
+        return new ArchivoService(properties);
     }
 
     private Archivo pdfWithText(String content) throws IOException {

@@ -31,7 +31,6 @@ import java.util.UUID;
 public class ArchivoService {
 
     private final AppProperties properties;
-    private final TesseractOcrService ocrService;
 
     public Path storageDir() {
         return Path.of(properties.storage().dir()).toAbsolutePath().normalize();
@@ -94,28 +93,16 @@ public class ArchivoService {
     }
 
     /**
-     * Texto del PDF usado para la búsqueda por palabra clave.
+     * Texto embebido del PDF, usado para la búsqueda por palabra clave.
      *
-     * <p>Si el PDF ya tiene una capa de texto se usa esa. Si no la tiene (por
-     * ejemplo, un escaneo), se aplica OCR con Tesseract. Devuelve {@code null}
-     * cuando no se pudo obtener texto, para no guardar saltos de línea vacíos.</p>
+     * <p>Devuelve {@code null} si el PDF no tiene capa de texto (por ejemplo,
+     * un escaneo) o si no se pudo leer, para no guardar saltos de línea vacíos.
+     * En ese caso el OCR se ejecuta después, de forma asíncrona.</p>
      */
-    public String extractText(Archivo archivo) {
-        Path path = resolve(archivo);
-        String text = extractEmbeddedText(archivo, path);
-
-        if (text != null && !text.isBlank())
-            return text.strip();
-
-        log.info("El PDF {} no contiene texto embebido; se intentará OCR", archivo.getPath());
-        String ocrText = ocrService.extractText(path);
-
-        return ocrText == null || ocrText.isBlank() ? null : ocrText.strip();
-    }
-
-    private String extractEmbeddedText(Archivo archivo, Path path) {
-        try (PDDocument document = Loader.loadPDF(path.toFile())) {
-            return new PDFTextStripper().getText(document);
+    public String extractEmbeddedText(Archivo archivo) {
+        try (PDDocument document = Loader.loadPDF(resolve(archivo).toFile())) {
+            String text = new PDFTextStripper().getText(document);
+            return text.isBlank() ? null : text.strip();
         } catch (IOException e) {
             log.warn("No se pudo extraer el texto de {}: {}", archivo.getPath(), e.getMessage());
             return null;

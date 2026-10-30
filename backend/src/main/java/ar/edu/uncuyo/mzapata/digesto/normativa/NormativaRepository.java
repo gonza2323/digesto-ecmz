@@ -4,8 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -21,6 +23,23 @@ public interface NormativaRepository extends JpaRepository<Normativa, UUID> {
 
     @EntityGraph(attributePaths = {"tipoDocumento", "autoridad", "expediente", "archivo"})
     Optional<Normativa> findByIdAndDeletedFalse(UUID id);
+
+    /**
+     * Actualiza el texto sólo si la normativa sigue activa y conserva el archivo
+     * que se procesó. Evita pisar una versión más nueva cargada mientras tanto.
+     */
+    @Modifying
+    @Transactional
+    @Query("""
+                UPDATE Normativa n
+                SET n.text = :text
+                WHERE n.id = :id
+                  AND n.archivo.id = :archivoId
+                  AND n.deleted = false
+            """)
+    int updateText(@Param("id") UUID id,
+                   @Param("archivoId") UUID archivoId,
+                   @Param("text") String text);
 
     /**
      * Unicidad de (año de publicación, número, tipo de normativa).

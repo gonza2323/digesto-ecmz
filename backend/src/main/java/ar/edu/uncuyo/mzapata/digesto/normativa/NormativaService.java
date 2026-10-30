@@ -14,6 +14,7 @@ import ar.edu.uncuyo.mzapata.digesto.setting.AppSettingService;
 import ar.edu.uncuyo.mzapata.digesto.tipodocumento.TipoDocumentoService;
 import ar.edu.uncuyo.mzapata.digesto.user.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class NormativaService {
     private final MailService mailService;
     private final AppProperties properties;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ---------- Consulta ----------
 
@@ -126,6 +128,7 @@ public class NormativaService {
 
         Archivo archivo = archivoService.store(file);
         archivoRepository.save(archivo);
+        String text = archivoService.extractEmbeddedText(archivo);
 
         Normativa normativa = Normativa.builder()
                 .number(dto.number())
@@ -140,12 +143,15 @@ public class NormativaService {
                 .tipoDocumento(tipoDocumentoService.find(dto.tipoDocumentoId()))
                 .expediente(resolveExpediente(dto))
                 .archivo(archivo)
-                .text(archivoService.extractText(archivo))
+                .text(text)
                 .build();
 
         normativa.replaceNotificaciones(dto.notificaciones());
 
-        return NormativaDetailDto.ofAdmin(normativaRepository.save(normativa));
+        Normativa saved = normativaRepository.save(normativa);
+        if (text == null) publishOcrRequest(saved);
+
+        return NormativaDetailDto.ofAdmin(saved);
     }
 
     @Transactional
@@ -175,16 +181,21 @@ public class NormativaService {
         normativa.setExpediente(resolveExpediente(dto));
         normativa.replaceNotificaciones(dto.notificaciones());
 
+        boolean needsOcr = false;
         if (file != null && !file.isEmpty()) {
             Archivo archivo = archivoRepository.save(archivoService.store(file));
             normativa.setArchivo(archivo);
-            normativa.setText(archivoService.extractText(archivo));
+            String text = archivoService.extractEmbeddedText(archivo);
+            normativa.setText(text);
+            needsOcr = text == null;
         }
 
         // La modificación queda en previsualización hasta que se envíe a aprobación.
         normativa.setVisible(false);
         normativa.setAccepted(false);
         normativa.setPendingApproval(false);
+
+        if (needsOcr) publishOcrRequest(normativa);
 
         return NormativaDetailDto.ofAdmin(normativa);
     }
@@ -274,6 +285,14 @@ public class NormativaService {
                         .recordNumber(dto.recordNumber())
                         .recordTitle(dto.recordTitle().trim())
                         .build()));
+    }
+
+    /**
+     * El OCR se procesa después del commit, cuando la normativa ya existe en la base.
+     */
+    private void publishOcrRequest(Normativa normativa) {
+        eventPublisher.publishEvent(new NormativaOcrRequested(
+                normativa.getId(), normativa.getArchivo().getId()));
     }
 
     /**
