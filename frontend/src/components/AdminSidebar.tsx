@@ -45,8 +45,8 @@ export function AdminSidebar({onNavigate}: { onNavigate?: () => void }) {
                         className={({isActive}) =>
                             `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                                 isActive
-                                    ? 'bg-institutional-50 text-institutional'
-                                    : 'text-neutral-700 hover:bg-neutral-100'
+                                    ? 'bg-institutional-50 text-institutional ring-1 ring-institutional-100'
+                                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-institutional'
                             }`
                         }
                     >

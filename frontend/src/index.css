@@ -2,12 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --body-color: #080800;
+    --bs-primary: #0066cb;
+    --bs-primary-rgb: 0, 102, 203;
+
+    --bs-link-color: var(--bs-primary);
+    --bs-link-hover-color: #004d98;
+
+    --bg-sitio: #0066cb;
+    --bg-nav: #0355a7;
+    --bg-light: #eeeeee;
+
+    --bs-border-color-translucent: #e9e9e9;
+}
+
 html {
     scroll-padding-top: 5rem;
 }
 
 body {
-    @apply bg-neutral-50 text-neutral-900 antialiased;
+    @apply bg-surface text-ink antialiased;
     font-family: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -31,7 +46,7 @@ h3,
 
 /* Visible keyboard focus everywhere, matching the institutional blue */
 :focus-visible {
-    outline: 2px solid #0355a7;
+    outline: 2px solid var(--bs-primary);
     outline-offset: 2px;
 }
 

@@ -5,11 +5,20 @@ export default {
         extend: {
             colors: {
                 institutional: {
-                    DEFAULT: '#0355a7',
-                    dark: '#024a91',
-                    50: '#eef6fd',
-                    100: '#d9eafb',
+                    DEFAULT: 'var(--bs-primary)',
+                    dark: 'var(--bs-link-hover-color)',
+                    nav: 'var(--bg-nav)',
+                    50: '#eef6ff',
+                    100: '#d9eaff',
                 },
+
+                site: 'var(--bg-sitio)',
+
+                surface: 'var(--bg-light)',
+
+                ink: 'var(--body-color)',
+
+                'site-border': 'var(--bs-border-color-translucent)',
             },
             fontFamily: {
                 sans: [

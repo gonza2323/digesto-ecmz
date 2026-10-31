@@ -5,6 +5,7 @@ import {backupsApi} from '@/api/backups'
 import {AdminSidebar} from '@/components/AdminSidebar'
 import {useAuth} from '@/hooks/useAuth'
 import {onBackupCreated} from '@/utils/backupEvents'
+import {SchoolBrand} from '@/components/SchoolBrand'
 
 export function AdminLayout() {
     const {user, hasRole, logout} = useAuth()
@@ -31,9 +32,9 @@ export function AdminLayout() {
     useEffect(() => onBackupCreated(() => setBackupAlert(null)), [])
 
     return (
-        <div className="min-h-screen bg-neutral-50 lg:grid lg:grid-cols-[16rem_1fr]">
+        <div className="min-h-screen bg-surface lg:grid lg:grid-cols-[16rem_1fr]">
             {/* Mobile topbar */}
-            <div className="lg:hidden flex items-center justify-between bg-[#701f3a] text-white px-4 py-3">
+            <div className="lg:hidden flex items-center justify-between bg-institutional-nav text-white px-4 py-3">
                 <button
                     type="button"
                     onClick={() => setSidebarOpen(true)}
@@ -56,7 +57,13 @@ export function AdminLayout() {
                     />
                     <div className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-xl flex flex-col">
                         <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200">
-                            <span className="font-display font-semibold text-institutional">Digesto Escuela</span>
+                            <NavLink
+                                to="/"
+                                onClick={() => setSidebarOpen(false)}
+                                className="inline-flex"
+                            >
+                                <SchoolBrand compact/>
+                            </NavLink>
                             <button type="button" onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú">
                                 <X className="w-5 h-5" aria-hidden="true"/>
                             </button>
@@ -81,8 +88,11 @@ export function AdminLayout() {
             {/* Desktop sidebar */}
             <aside className="hidden lg:flex lg:flex-col border-r border-neutral-200 bg-white">
                 <div className="px-4 py-4 border-b border-neutral-200">
-                    <NavLink to="/" className="font-display font-semibold text-institutional text-lg">
-                        Digesto Escuela
+                    <NavLink
+                        to="/"
+                        className="inline-flex rounded-lg"
+                    >
+                        <SchoolBrand compact/>
                     </NavLink>
                     <p className="text-xs text-neutral-500 mt-0.5">Panel administrativo</p>
                 </div>
@@ -94,7 +104,7 @@ export function AdminLayout() {
             <div className="flex flex-col min-w-0">
                 <div
                     className="hidden lg:flex items-center justify-end gap-4 border-b border-neutral-200 bg-white px-6 py-3">
-                    <span className="text-sm font-medium text-[#701f3a]">
+                    <span className="text-sm font-medium text-institutional">
                         {roleLabel} — {user?.displayName}
                     </span>
                     <NavLink

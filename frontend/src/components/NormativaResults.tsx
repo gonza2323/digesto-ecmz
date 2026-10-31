@@ -17,7 +17,7 @@ export function NormativaResults({items, detailPath, renderActions, showEstado}:
     return (
         <>
             {/* Desktop: table */}
-            <div className="hidden md:block bg-white border border-neutral-200 rounded-lg overflow-hidden">
+            <div className="hidden md:block bg-white border border-site-border rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
@@ -82,7 +82,7 @@ export function NormativaResults({items, detailPath, renderActions, showEstado}:
             {/* Mobile: cards */}
             <ul className="md:hidden space-y-3">
                 {items.map((item) => (
-                    <li key={item.id} className="bg-white border border-neutral-200 rounded-lg p-4">
+                    <li key={item.id} className="bg-white border border-site-border rounded-xl p-4 shadow-sm">
                         <div className="flex items-start gap-3 mb-3">
                             <FileText className="w-5 h-5 text-institutional shrink-0 mt-0.5" aria-hidden="true"/>
                             <div className="flex-1 min-w-0">

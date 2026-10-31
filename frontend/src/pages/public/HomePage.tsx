@@ -124,8 +124,55 @@ export function HomePage() {
     const pageData = results.data
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-            <form onSubmit={handleSubmit} className="mb-6 sm:mb-8" role="search">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+            {/* Presentación */}
+            <section
+                className="mb-6 sm:mb-8"
+                aria-labelledby="home-title"
+            >
+                <span
+                    className="
+                        inline-block rounded-full
+                        bg-institutional-50
+                        px-3 py-1
+                        text-xs font-semibold
+                        text-institutional
+                    "
+                >
+                    Consulta pública
+                </span>
+
+                <h1
+                    id="home-title"
+                    className="
+                        mt-3 font-display
+                        text-3xl sm:text-4xl
+                        font-semibold text-ink
+                    "
+                >
+                    Normativas institucionales
+                </h1>
+
+                <p className="mt-2 max-w-2xl text-sm text-neutral-600 sm:text-base">
+                    Buscá resoluciones y documentos oficiales de la
+                    Escuela de Comercio Martín Zapata.
+                </p>
+            </section>
+
+            {/* Buscador */}
+            <form
+                onSubmit={handleSubmit}
+                className="
+                    mb-6 sm:mb-8
+                    rounded-2xl
+                    border border-site-border
+                    bg-white
+                    p-4 sm:p-6
+                    shadow-sm
+                "
+                role="search"
+            >
                 <div className="relative mb-3 sm:mb-4">
                     <Search
                         className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-neutral-400"
@@ -166,7 +213,16 @@ export function HomePage() {
                 {filtersOpen && (
                     <div
                         id="filters-panel"
-                        className="mt-4 bg-white border border-neutral-200 rounded-lg p-4 sm:p-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                        className="
+                            mt-4
+                            grid gap-4
+                            rounded-xl
+                            border border-site-border
+                            bg-neutral-50
+                            p-4 sm:p-6
+                            sm:grid-cols-2
+                            lg:grid-cols-4
+                        "
                     >
                         <FormField label="Tipo de normativa" htmlFor="f-tipo">
                             <Select
