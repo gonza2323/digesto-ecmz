@@ -80,6 +80,16 @@ public class BackupService {
 
     // ---------- Generación ----------
 
+    static boolean vencido(Instant ultimo, int meses, Instant ahora) {
+        return ultimo.atZone(ZoneOffset.UTC).plusMonths(meses).toInstant().isBefore(ahora);
+    }
+
+    static String sinParametrosNoSoportados(String contenido) {
+        return PARAMETRO_POSTGRES_17.matcher(contenido).replaceFirst("");
+    }
+
+    // ---------- Restauración ----------
+
     @Transactional(readOnly = true)
     public BackupStatusDto status() {
         String stored = appSettingService.get(AppSettingService.LAST_BACKUP, null);
@@ -92,12 +102,6 @@ public class BackupService {
         boolean alerta = vencido(ultimo, meses, Instant.now());
         return new BackupStatusDto(ultimo, alerta, meses);
     }
-
-    static boolean vencido(Instant ultimo, int meses, Instant ahora) {
-        return ultimo.atZone(ZoneOffset.UTC).plusMonths(meses).toInstant().isBefore(ahora);
-    }
-
-    // ---------- Restauración ----------
 
     /**
      * Arma el ZIP en un archivo temporal y registra la fecha del backup.
@@ -212,10 +216,6 @@ public class BackupService {
 
         Files.writeString(dump, limpio, StandardCharsets.UTF_8);
         log.info("Se quitó SET transaction_timeout del dump para poder restaurarlo en PostgreSQL 16");
-    }
-
-    static String sinParametrosNoSoportados(String contenido) {
-        return PARAMETRO_POSTGRES_17.matcher(contenido).replaceFirst("");
     }
 
     /**

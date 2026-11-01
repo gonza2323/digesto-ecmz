@@ -146,7 +146,8 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                         detailPath={(id) => `/admin/normativas/${id}`}
                         renderActions={(item) => (
                             <>
-                                <IconLink to={`/admin/normativas/${item.id}`} label={`Ver ${item.title}`} title="Ver normativa">
+                                <IconLink to={`/admin/normativas/${item.id}`} label={`Ver ${item.title}`}
+                                          title="Ver normativa">
                                     <Eye className="w-4 h-4" aria-hidden="true"/>
                                 </IconLink>
                                 <a
@@ -159,7 +160,8 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
                                 >
                                     <ExternalLink className="w-4 h-4" aria-hidden="true"/>
                                 </a>
-                                <IconLink to={`/admin/normativas/${item.id}/editar`} label={`Editar ${item.title}`} title="Editar normativa">
+                                <IconLink to={`/admin/normativas/${item.id}/editar`} label={`Editar ${item.title}`}
+                                          title="Editar normativa">
                                     <Pencil className="w-4 h-4" aria-hidden="true"/>
                                 </IconLink>
                                 {isSuper && item.estado === 'PENDIENTE' && (
@@ -199,7 +201,12 @@ export function NormativasListPage({pendientesOnly = false}: Props) {
     )
 }
 
-function IconLink({to, label, title, children}: { to: string; label: string; title: string; children: React.ReactNode }) {
+function IconLink({to, label, title, children}: {
+    to: string;
+    label: string;
+    title: string;
+    children: React.ReactNode
+}) {
     return (
         <Link
             to={to}

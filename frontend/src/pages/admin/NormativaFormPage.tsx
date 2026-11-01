@@ -269,7 +269,8 @@ export function NormativaFormPage() {
                         </Select>
                     </FormField>
 
-                    <FormField label="Autoridad emisora" htmlFor="autoridadId" required error={errors.autoridadId?.message}>
+                    <FormField label="Autoridad emisora" htmlFor="autoridadId" required
+                               error={errors.autoridadId?.message}>
                         <Select
                             id="autoridadId"
                             hasError={!!errors.autoridadId}

@@ -100,10 +100,11 @@ export function NormativaAdminDetailPage() {
                                 <Check className="w-4 h-4" aria-hidden="true"/>
                                 Publicar
                             </Button>
-                            {isPending && <Button variant="secondary" onClick={() => actions.askReject(data.id, data.title)}>
-                                <X className="w-4 h-4" aria-hidden="true"/>
-                                Rechazar
-                            </Button>}
+                            {isPending &&
+                                <Button variant="secondary" onClick={() => actions.askReject(data.id, data.title)}>
+                                    <X className="w-4 h-4" aria-hidden="true"/>
+                                    Rechazar
+                                </Button>}
                         </>
                     )}
                     {!isPublished && !hasRole('SUPERADMIN') && !isPending && (

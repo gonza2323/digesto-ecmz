@@ -2,11 +2,11 @@ import {API_URL, http, toQueryParams} from '@/api/http'
 import type {Page, SortOption} from '@/types/common'
 import type {
     AprobacionResult,
+    Expediente,
     NormativaDetail,
     NormativaFilters,
     NormativaFormValues,
     NormativaSummary,
-    Expediente,
 } from '@/types/normativa'
 
 export interface SearchOptions {

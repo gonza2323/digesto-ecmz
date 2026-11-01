@@ -16,20 +16,20 @@ producción (prod) normalmente se colocan detrás de un servidor web con HTTPS.
 
 ```mermaid
 flowchart LR
-  Usuario["Navegador del usuario"]
-  Web["Interfaz web<br/>HTTP :5173 en dev<br/>HTTPS :443 en prod"]
-  API["Servidor de la aplicación<br/>HTTP :8080<br/>JSON y multipart"]
-  DB[("PostgreSQL<br/>TCP :5433 host<br/>:5432 container")]
-  Storage[("Almacenamiento<br/>STORAGE_DIR<br/>archivos PDF")]
-  SMTP["Servidor de correo<br/>SMTP + STARTTLS :587"]
-  Tools["pg_dump / psql<br/>procesos del servidor"]
-  Usuario -->|HTTP/HTTPS| Web
-  Web -->|HTTP/HTTPS<br/>cookie de sesión| API
-  API -->|JDBC sobre TCP| DB
-  API -->|lectura/escritura local| Storage
-  API -->|SMTP| SMTP
-  API -->|ejecución local| Tools
-  Tools -->|dump/restauración| DB
+    Usuario["Navegador del usuario"]
+    Web["Interfaz web<br/>HTTP :5173 en dev<br/>HTTPS :443 en prod"]
+    API["Servidor de la aplicación<br/>HTTP :8080<br/>JSON y multipart"]
+    DB[("PostgreSQL<br/>TCP :5433 host<br/>:5432 container")]
+    Storage[("Almacenamiento<br/>STORAGE_DIR<br/>archivos PDF")]
+    SMTP["Servidor de correo<br/>SMTP + STARTTLS :587"]
+    Tools["pg_dump / psql<br/>procesos del servidor"]
+    Usuario -->|HTTP/HTTPS| Web
+    Web -->|HTTP/HTTPS<br/>cookie de sesión| API
+    API -->|JDBC sobre TCP| DB
+    API -->|lectura/escritura local| Storage
+    API -->|SMTP| SMTP
+    API -->|ejecución local| Tools
+    Tools -->|dump/restauración| DB
 ```
 
 ### Componentes
@@ -178,10 +178,10 @@ http://localhost:5173
 
 En una base nueva, el sistema crea estas cuentas:
 
-| Usuario                            | Contraseña |
-|------------------------------------|--------------------|
-| `admin@mzapata.uncuyo.edu.ar`      | `admin`            |
-| `superadmin@mzapata.uncuyo.edu.ar` | `superadmin`       |
+| Usuario                            | Contraseña   |
+|------------------------------------|--------------|
+| `admin@mzapata.uncuyo.edu.ar`      | `admin`      |
+| `superadmin@mzapata.uncuyo.edu.ar` | `superadmin` |
 
 La primera vez que ingresan deben cambiar la contraseña. Estas credenciales son
 solo para desarrollo y deben cambiarse antes de publicar el sistema.
@@ -286,21 +286,21 @@ backend/src/main/resources/application.properties
 
 Las variables más relevantes son:
 
-| Variable        | Uso                                                                          |
-|-----------------|------------------------------------------------------------------------------|
-| `MAIL_HOST`     | Servidor de correo. Si no se define, los correos se registran y no se envían |
-| `MAIL_PORT`     | Puerto del servidor de correo, normalmente `587`                             |
-| `MAIL_USERNAME` | Usuario del correo                                                           |
-| `MAIL_PASSWORD` | Contraseña del correo                                                        |
-| `MAIL_FROM`     | Dirección que aparece como remitente                                         |
-| `STORAGE_DIR`   | Carpeta donde se guardan los PDF                                             |
-| `TESSERACT`     | Binario de Tesseract usado para OCR; por defecto `tesseract`                 |
-| `OCR_LANG`      | Idiomas de Tesseract; por defecto `spa`                                      |
-| `OCR_DPI`       | Resolución usada al renderizar páginas para OCR; por defecto `300`           |
-| `OCR_PSM`       | Modo de segmentación de Tesseract; por defecto `3`                           |
-| `OCR_TIMEOUT_SECONDS` | Tiempo máximo de OCR por página; por defecto `120`                     |
-| `PG_DUMP`       | Ubicación de `pg_dump`                                                       |
-| `PSQL`          | Ubicación de `psql`                                                          |
+| Variable              | Uso                                                                          |
+|-----------------------|------------------------------------------------------------------------------|
+| `MAIL_HOST`           | Servidor de correo. Si no se define, los correos se registran y no se envían |
+| `MAIL_PORT`           | Puerto del servidor de correo, normalmente `587`                             |
+| `MAIL_USERNAME`       | Usuario del correo                                                           |
+| `MAIL_PASSWORD`       | Contraseña del correo                                                        |
+| `MAIL_FROM`           | Dirección que aparece como remitente                                         |
+| `STORAGE_DIR`         | Carpeta donde se guardan los PDF                                             |
+| `TESSERACT`           | Binario de Tesseract usado para OCR; por defecto `tesseract`                 |
+| `OCR_LANG`            | Idiomas de Tesseract; por defecto `spa`                                      |
+| `OCR_DPI`             | Resolución usada al renderizar páginas para OCR; por defecto `300`           |
+| `OCR_PSM`             | Modo de segmentación de Tesseract; por defecto `3`                           |
+| `OCR_TIMEOUT_SECONDS` | Tiempo máximo de OCR por página; por defecto `120`                           |
+| `PG_DUMP`             | Ubicación de `pg_dump`                                                       |
+| `PSQL`                | Ubicación de `psql`                                                          |
 
 No deben guardarse contraseñas reales en el repositorio.
 

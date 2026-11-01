@@ -37,7 +37,9 @@ public class UsuarioService {
                 .orElseThrow(() -> BusinessException.notFound("El usuario no existe"));
     }
 
-    /** Crea el usuario y envía un enlace de activación de un solo uso. */
+    /**
+     * Crea el usuario y envía un enlace de activación de un solo uso.
+     */
     @Transactional
     public UsuarioDto create(UsuarioFormDto dto) {
         String email = dto.email().trim().toLowerCase();

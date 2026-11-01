@@ -4,9 +4,9 @@ interface SchoolBrandProps {
 }
 
 export function SchoolBrand({
-    inverted = false,
-    compact = false
-}: SchoolBrandProps) {
+                                inverted = false,
+                                compact = false
+                            }: SchoolBrandProps) {
     return (
         <span className="inline-flex min-w-0 items-center gap-3">
 

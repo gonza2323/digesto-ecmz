@@ -6,7 +6,12 @@ import type {AuthUser} from '@/types/auth'
 import {makeAuth, renderAt, Route} from '@/test/renderWithAuth'
 
 const admin: AuthUser = {userId: 'u1', displayName: 'Admin Test', roles: ['ADMIN'], mustChangePassword: false}
-const superadmin: AuthUser = {userId: 'u2', displayName: 'Superadmin Test', roles: ['SUPERADMIN'], mustChangePassword: false}
+const superadmin: AuthUser = {
+    userId: 'u2',
+    displayName: 'Superadmin Test',
+    roles: ['SUPERADMIN'],
+    mustChangePassword: false
+}
 const mustChange: AuthUser = {userId: 'u3', displayName: 'Cambio Test', roles: ['ADMIN'], mustChangePassword: true}
 
 const routes = (

@@ -63,7 +63,9 @@ public class Normativa extends BaseEntity {
 
     private boolean accepted;
 
-    /** Indica que la normativa está esperando la decisión de un superadministrador. */
+    /**
+     * Indica que la normativa está esperando la decisión de un superadministrador.
+     */
     private boolean pendingApproval;
 
     /**
