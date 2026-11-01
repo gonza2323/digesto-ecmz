@@ -28,6 +28,7 @@ dist/
 .sts4-cache
 
 ### IntelliJ IDEA ###
+.run/
 *.iws
 *.iml
 *.ipr

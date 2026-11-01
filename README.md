@@ -149,6 +149,7 @@ En una terminal:
 
 ```bash
 cd backend
+source ../sources/.env.sh  # Carga las variables de entorno
 ./mvnw spring-boot:run
 ```
 
@@ -187,6 +188,23 @@ La primera vez que ingresan deben cambiar la contraseña. Estas credenciales son
 solo para desarrollo y deben cambiarse antes de publicar el sistema.
 
 También se crean automáticamente los tipos de normativa y autoridades iniciales.
+
+### Datos de ejemplo (solo desarrollo)
+
+El repositorio incluye un script para cargar normativas, usuarios y catálogos de
+ejemplo usando los PDF de `data/pdfsamples`. El backend debe estar en ejecución.
+
+```bash
+./scripts/seed-dev.sh --reset
+```
+
+`--reset` elimina **todos** los datos de la base configurada y los PDF
+almacenados antes de cargar los ejemplos. Usarlo únicamente en desarrollo.
+
+El script necesita `curl`, `jq`, `psql` y el backend disponible en
+`http://localhost:8080/api`. Carga 10 normativas (publicadas, pendientes, no
+publicadas y eliminadas), usuarios y catálogos de ejemplo. Al finalizar imprime
+las cuentas creadas y un resumen de los datos cargados.
 
 ## Uso del panel administrativo
 
